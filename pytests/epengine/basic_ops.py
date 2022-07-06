@@ -1331,11 +1331,26 @@ class basic_ops(ClusterSetup):
         6. Verify that we're able to access vbucket state of each vbucket for bucket B before bucket A is fully warmed up.
             With the idea that the warmup of bucket B isn't blocked by the warmup for bucket A despite bucket A having a large number of documents.
         """
+        bucket_small = "small_bucket"
+        self.create_bucket(cluster=self.cluster, bucket_name=bucket_small)
         bucket_big = self.cluster.buckets[0]
         doc_gen = doc_generator(self.key, 0, self.num_items,
                                 doc_size=10000)
         load_task = self.task.async_load_gen_docs(
             self.cluster, bucket_big, doc_gen,
+            DocLoading.Bucket.DocOps.CREATE, 0,
+            batch_size=500, process_concurrency=8,
+            replicate_to=self.replicate_to, persist_to=self.persist_to,
+            durability=self.durability_level,
+            compression=self.sdk_compression,
+            timeout_secs=self.sdk_timeout,
+            sdk_client_pool=self.sdk_client_pool,
+            print_ops_rate=False)
+        self.task_manager.get_task_result(load_task)
+
+        doc_gen_small = doc_generator(self.key, 0, 4000, doc_size=10000)
+        load_task = self.task.async_load_gen_docs(
+            self.cluster, bucket_big, doc_gen_small,
             DocLoading.Bucket.DocOps.CREATE, 0,
             batch_size=500, process_concurrency=8,
             replicate_to=self.replicate_to, persist_to=self.persist_to,
