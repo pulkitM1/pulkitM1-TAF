@@ -1332,7 +1332,7 @@ class basic_ops(ClusterSetup):
             With the idea that the warmup of bucket B isn't blocked by the warmup for bucket A despite bucket A having a large number of documents.
         """
 
-        self.create_bucket(cluster=self.cluster, bucket_name=bucket_small)
+        self.create_bucket(cluster=self.cluster, bucket_name="bucket_small")
         bucket_big = self.cluster.buckets[0]
         bucket_small = self.cluster.buckets[1]
         print("big!!!!")
