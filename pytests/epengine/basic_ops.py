@@ -1321,6 +1321,18 @@ class basic_ops(ClusterSetup):
 
         self.validate_test_failure()
 
+    def test_MB_47267(self):
+        """
+        1. Create a single KV node
+        2. Create two buckets A and B
+        3. Add a large number of documents to all vbucket in bucket A
+        4. Add few documents to each vbucket in bucket B (orders of magnitude less)
+        5. Shutdown and warmup the node (with node A warming up first)
+        6. Verify that we're able to access vbucket state of each vbucket for bucket B before bucket A is fully warmed up.
+            With the idea that the warmup of bucket B isn't blocked by the warmup for bucket A despite bucket A having a large number of documents.
+        """
+        bucket = self.cluster.buckets[0]
+
     def test_MB_41942(self):
         """
         1. Load huge dataset into bucket with replica=1
