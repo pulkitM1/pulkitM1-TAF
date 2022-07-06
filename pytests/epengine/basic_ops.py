@@ -1334,6 +1334,8 @@ class basic_ops(ClusterSetup):
         bucket_small = "small_bucket"
         self.create_bucket(cluster=self.cluster, bucket_name=bucket_small)
         bucket_big = self.cluster.buckets[0]
+        print("big!!!!")
+        print(bucket_big)
         doc_gen = doc_generator(self.key, 0, self.num_items,
                                 doc_size=10000)
         load_task = self.task.async_load_gen_docs(
@@ -1349,7 +1351,7 @@ class basic_ops(ClusterSetup):
         self.task_manager.get_task_result(load_task)
 
         doc_gen_small = doc_generator(self.key, 0, 4000, doc_size=10000)
-        load_task = self.task.async_load_gen_docs(
+        load_task_2 = self.task.async_load_gen_docs(
             self.cluster, bucket_big, doc_gen_small,
             DocLoading.Bucket.DocOps.CREATE, 0,
             batch_size=500, process_concurrency=8,
@@ -1359,9 +1361,10 @@ class basic_ops(ClusterSetup):
             timeout_secs=self.sdk_timeout,
             sdk_client_pool=self.sdk_client_pool,
             print_ops_rate=False)
-        self.task_manager.get_task_result(load_task)
+        self.task_manager.get_task_result(load_task_2)
         self.bucket_util._wait_for_stats_all_buckets(self.cluster,
                                                      self.cluster.buckets)
+
 
 
     def test_MB_41942(self):
