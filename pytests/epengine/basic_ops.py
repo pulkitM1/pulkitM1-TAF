@@ -1332,6 +1332,8 @@ class basic_ops(ClusterSetup):
             With the idea that the warmup of bucket B isn't blocked by the warmup for bucket A despite bucket A having a large number of documents.
         """
 
+        shell_conn = dict()
+        error_sim = dict()
         self.create_bucket(cluster=self.cluster, bucket_name="bucket_small")
         bucket_big = self.cluster.buckets[0]
         bucket_small = self.cluster.buckets[1]
@@ -1365,7 +1367,15 @@ class basic_ops(ClusterSetup):
         self.task_manager.get_task_result(load_task_2)
         self.bucket_util._wait_for_stats_all_buckets(self.cluster,
                                                      self.cluster.buckets)
+        target_node = self.getTargetNodes()
+        # Create shell_connections
+        shell_conn[target_node.ip] = RemoteMachineShellConnection(target_node)
+
+        # Perform specified action
+        error_sim[target_node.ip] = CouchbaseError(self.log, shell_conn[target_node.ip])
+        error_sim[target_node.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=self.bucket.name)
         print("end")
+        print(target_node)
 
 
 
