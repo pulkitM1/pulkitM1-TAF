@@ -1377,10 +1377,10 @@ class basic_ops(ClusterSetup):
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_small.name)
         print("start!!!")
 
-        if not self.bucket_util._wait_warmup_completed(target_nodes, bucket_small):
+        if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_small):
             self.log.critical("Bucket %s warmup failed after loading from tar"
                               % bucket_small.name)
-        if not self.bucket_util._wait_warmup_completed(target_nodes, bucket_big):
+        if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_big):
             self.log.critical("Bucket %s warmup failed after loading from tar"
                               % bucket_big.name)
         print("end")
