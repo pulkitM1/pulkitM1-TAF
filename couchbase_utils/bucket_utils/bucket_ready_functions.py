@@ -4249,6 +4249,7 @@ class BucketUtils(ScopeUtils):
 
         self.log.debug("Waiting for bucket %s to complete warm-up"
                        % bucket.name)
+        print("Waiting for bucket %s to complete warm-up" % bucket.name)
         warmed_up = False
         start = time.time()
         for server in servers:
