@@ -1342,7 +1342,7 @@ class basic_ops(ClusterSetup):
         print(self.warmup_timeout)
         print(type(bucket_big))
         doc_gen = doc_generator(self.key, 0, self.num_items,
-                                doc_size=29999)
+                                doc_size=19999)
         load_task = self.task.async_load_gen_docs(
             self.cluster, bucket_big, doc_gen,
             DocLoading.Bucket.DocOps.CREATE, 0,
@@ -1388,19 +1388,14 @@ class basic_ops(ClusterSetup):
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
 
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, self.warmup_timeout))
         print("start!!!")
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small))
         print("true start!!!")
 
-
-        # self.assertTrue(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small) and
-        #                 not (self.bucket_util._wait_warmup_completed([target_nodes], bucket_big)),
-        #                 "Small bucket warmup blocked by the large one")
+        self.assertTrue((not(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, self.warmup_timeout)))
+                        and self.bucket_util._wait_warmup_completed([target_nodes], bucket_small),
+                        "Small bucket Warmup blocked by the large one")
         print("end")
         shell_conn[target_nodes.ip].disconnect()
-
-
 
     def test_MB_41942(self):
         """
