@@ -1375,6 +1375,7 @@ class basic_ops(ClusterSetup):
         # Perform specified action
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_small.name)
+        error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
         print("start!!!")
 
         if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_small):
