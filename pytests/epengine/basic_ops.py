@@ -1385,8 +1385,8 @@ class basic_ops(ClusterSetup):
 
         print("start!!!")
 
-        self.assertTrue(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small, 10000) and
-                        (not self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 10000)),
+        self.assertTrue(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small) and
+                        (not self.bucket_util._wait_warmup_completed([target_nodes], bucket_big)),
                         "Small bucket warmup blocked by the large one")
         print("end")
 
