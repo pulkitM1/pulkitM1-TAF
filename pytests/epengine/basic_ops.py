@@ -1369,14 +1369,13 @@ class basic_ops(ClusterSetup):
                                                      self.cluster.buckets)
         target_nodes = choice(self.cluster_util.get_kv_nodes(self.cluster))
         print(target_nodes)
-        # Create shell_connections
-        shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_nodes)
-
-        # Perform specified action
-        error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
-        error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_small.name)
+        # # Create shell_connections
+        # shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_nodes)
+        #
+        # # Perform specified action
+        # error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
+        # error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_small.name)
         print("mid!!!")
-        error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
         print("start!!!")
 
         # bucket_helper = BucketHelper(self.cluster.master)
@@ -1385,10 +1384,10 @@ class basic_ops(ClusterSetup):
         #     num_reader_threads=1,
         #     num_storage_threads=1)
 
-        if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_small, 600):
+        if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_small, 10000):
             print("not done!!small")
             self.log.info("Bucket %s warmup failed after loading from tar" % bucket_small.name)
-        if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 600):
+        if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 10000):
             print("not done!!big")
             self.log.info("Bucket %s warmup failed after loading from tar" % bucket_big.name)
         print("end")
