@@ -1340,7 +1340,7 @@ class basic_ops(ClusterSetup):
         print("big!!!!")
         print(type(bucket_big))
         doc_gen = doc_generator(self.key, 0, self.num_items,
-                                doc_size=100000)
+                                doc_size=19999)
         load_task = self.task.async_load_gen_docs(
             self.cluster, bucket_big, doc_gen,
             DocLoading.Bucket.DocOps.CREATE, 0,
@@ -1381,11 +1381,11 @@ class basic_ops(ClusterSetup):
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
 
+        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 2))
         print("start!!!")
-
         print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small))
         print("true start!!!")
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 2))
+
 
         # self.assertTrue(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small) and
         #                 not (self.bucket_util._wait_warmup_completed([target_nodes], bucket_big)),
