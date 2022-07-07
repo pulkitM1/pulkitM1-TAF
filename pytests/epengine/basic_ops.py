@@ -1367,7 +1367,7 @@ class basic_ops(ClusterSetup):
         self.task_manager.get_task_result(load_task_2)
         self.bucket_util._wait_for_stats_all_buckets(self.cluster,
                                                      self.cluster.buckets)
-        target_node = DurabilityHelper.getTargetNodes(self.cluster, self.nodes_init)
+        target_node = DurabilityHelper.getTargetNodes(self.cluster, self.nodes_init, 1)
         # Create shell_connections
         shell_conn[target_node.ip] = RemoteMachineShellConnection(target_node)
 
