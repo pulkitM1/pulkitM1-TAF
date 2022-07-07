@@ -1353,7 +1353,7 @@ class basic_ops(ClusterSetup):
             print_ops_rate=False)
         self.task_manager.get_task_result(load_task)
 
-        doc_gen_small = doc_generator(self.key, 0, 4000, doc_size=10000)
+        doc_gen_small = doc_generator(self.key, 0, 2000, doc_size=10000)
         load_task_2 = self.task.async_load_gen_docs(
             self.cluster, bucket_small, doc_gen_small,
             DocLoading.Bucket.DocOps.CREATE, 0,
@@ -1372,24 +1372,22 @@ class basic_ops(ClusterSetup):
         # Create shell_connections
         shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_nodes)
 
+        bucket_helper = BucketHelper(self.cluster.master)
+        bucket_helper.update_memcached_settings(
+            num_writer_threads=1,
+            num_reader_threads=1,
+            num_storage_threads=1)
+        print("mid!!!")
+
         # Perform specified action
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
-        print("mid!!!")
+
         print("start!!!")
 
-        # bucket_helper = BucketHelper(self.cluster.master)
-        # bucket_helper.update_memcached_settings(
-        #     num_writer_threads=1,
-        #     num_reader_threads=1,
-        #     num_storage_threads=1)
-
-        if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_small, 10000):
-            print("not done!!small")
-            self.log.info("Bucket %s warmup failed after loading from tar" % bucket_small.name)
-        if not self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 10000):
-            print("not done!!big")
-            self.log.info("Bucket %s warmup failed after loading from tar" % bucket_big.name)
+        self.assertTrue(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small, 10000) and
+                        (not self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 10000)),
+                        "Small bucket warmup blocked by the large one")
         print("end")
 
 
