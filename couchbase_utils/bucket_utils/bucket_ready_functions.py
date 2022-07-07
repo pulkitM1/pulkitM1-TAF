@@ -4263,7 +4263,6 @@ class BucketUtils(ScopeUtils):
                 try:
                     result = cbstat_obj.all_stats(bucket.name)
                     print("result")
-                    print(result)
                     if result["ep_warmup_thread"] == "complete":
                         warmed_up = True
                         break

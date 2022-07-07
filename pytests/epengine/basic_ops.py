@@ -42,6 +42,7 @@ class basic_ops(ClusterSetup):
 
         self.doc_ops = self.input.param("doc_ops", "").split(";")
         self.observe_test = self.input.param("observe_test", False)
+        self.warmup_timeout = self.input.param("warmup_timeout", 300)
         # Scope/collection name can be default or create a random one to test
         self.scope_name = self.input.param("scope", CbServer.default_scope)
         self.collection_name = self.input.param("collection",
@@ -1338,14 +1339,17 @@ class basic_ops(ClusterSetup):
         bucket_big = self.cluster.buckets[0]
         bucket_small = self.cluster.buckets[1]
         print("big!!!!")
+        print(self.warmup_timeout)
         print(type(bucket_big))
         doc_gen = doc_generator(self.key, 0, self.num_items,
-                                doc_size=19999)
+                                doc_size=29999)
         load_task = self.task.async_load_gen_docs(
             self.cluster, bucket_big, doc_gen,
             DocLoading.Bucket.DocOps.CREATE, 0,
-            batch_size=500, process_concurrency=8,
-            replicate_to=self.replicate_to, persist_to=self.persist_to,
+            batch_size=500,
+            process_concurrency=8,
+            replicate_to=self.replicate_to,
+            persist_to=self.persist_to,
             durability=self.durability_level,
             compression=self.sdk_compression,
             timeout_secs=self.sdk_timeout,
@@ -1357,8 +1361,10 @@ class basic_ops(ClusterSetup):
         load_task_2 = self.task.async_load_gen_docs(
             self.cluster, bucket_small, doc_gen_small,
             DocLoading.Bucket.DocOps.CREATE, 0,
-            batch_size=500, process_concurrency=8,
-            replicate_to=self.replicate_to, persist_to=self.persist_to,
+            batch_size=500,
+            process_concurrency=8,
+            replicate_to=self.replicate_to,
+            persist_to=self.persist_to,
             durability=self.durability_level,
             compression=self.sdk_compression,
             timeout_secs=self.sdk_timeout,
@@ -1372,7 +1378,8 @@ class basic_ops(ClusterSetup):
         bucket_helper.update_memcached_settings(
             num_writer_threads=1,
             num_reader_threads=1,
-            num_storage_threads=1)
+            num_storage_threads=1
+        )
         print(target_nodes)
         # Create shell_connections
         shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_nodes)
@@ -1381,7 +1388,7 @@ class basic_ops(ClusterSetup):
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
 
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 2))
+        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, self.warmup_timeout))
         print("start!!!")
         print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small))
         print("true start!!!")
@@ -1391,6 +1398,7 @@ class basic_ops(ClusterSetup):
         #                 not (self.bucket_util._wait_warmup_completed([target_nodes], bucket_big)),
         #                 "Small bucket warmup blocked by the large one")
         print("end")
+        shell_conn[target_nodes.ip].disconnect()
 
 
 
