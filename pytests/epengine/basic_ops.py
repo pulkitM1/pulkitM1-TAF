@@ -1369,16 +1369,13 @@ class basic_ops(ClusterSetup):
                                                      self.cluster.buckets)
         target_nodes = choice(self.cluster_util.get_kv_nodes(self.cluster))
         print(target_nodes)
-        target_node = self.cluster.nodes_in_cluster
-        print(target_node)
         # Create shell_connections
-        shell_conn[target_node.ip] = RemoteMachineShellConnection(target_node)
+        shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_node)
 
         # Perform specified action
-        error_sim[target_node.ip] = CouchbaseError(self.log, shell_conn[target_node.ip])
-        error_sim[target_node.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=self.bucket.name)
+        error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
+        error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=self.bucket.name)
         print("end")
-        print(target_node)
 
 
 
