@@ -1340,7 +1340,7 @@ class basic_ops(ClusterSetup):
         print("big!!!!")
         print(type(bucket_big))
         doc_gen = doc_generator(self.key, 0, self.num_items,
-                                doc_size=10000)
+                                doc_size=100000)
         load_task = self.task.async_load_gen_docs(
             self.cluster, bucket_big, doc_gen,
             DocLoading.Bucket.DocOps.CREATE, 0,
@@ -1353,7 +1353,7 @@ class basic_ops(ClusterSetup):
             print_ops_rate=False)
         self.task_manager.get_task_result(load_task)
 
-        doc_gen_small = doc_generator(self.key, 0, 2000, doc_size=10000)
+        doc_gen_small = doc_generator(self.key, 0, 1000, doc_size=10000)
         load_task_2 = self.task.async_load_gen_docs(
             self.cluster, bucket_small, doc_gen_small,
             DocLoading.Bucket.DocOps.CREATE, 0,
@@ -1385,7 +1385,7 @@ class basic_ops(ClusterSetup):
 
         print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small))
         print("true start!!!")
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big))
+        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 2))
 
         # self.assertTrue(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small) and
         #                 not (self.bucket_util._wait_warmup_completed([target_nodes], bucket_big)),
