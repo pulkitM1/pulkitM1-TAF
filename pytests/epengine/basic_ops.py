@@ -1370,7 +1370,7 @@ class basic_ops(ClusterSetup):
         target_nodes = choice(self.cluster_util.get_kv_nodes(self.cluster))
         print(target_nodes)
         # Create shell_connections
-        shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_node)
+        shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_nodes)
 
         # Perform specified action
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
