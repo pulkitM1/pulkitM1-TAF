@@ -1391,7 +1391,7 @@ class basic_ops(ClusterSetup):
         print(bucket_small.name)
         print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small))
         print("mid")
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 0))
+        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 20))
         print("end")
                         # , "Bucket with less data not accessible when other bucket getting warmed up.")
 
