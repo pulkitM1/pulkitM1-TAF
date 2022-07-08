@@ -4268,6 +4268,8 @@ class BucketUtils(ScopeUtils):
                 sleep(2, "Warm-up not complete for %s on %s" % (bucket.name,
                                                                 server.ip))
             shell.disconnect()
+        print("%s to complete warm-up" % bucket.name)
+        print(warmed_up)
         return warmed_up
 
     def add_rbac_user(self, cluster_node, testuser=None, rolelist=None):
