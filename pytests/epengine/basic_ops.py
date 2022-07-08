@@ -37,7 +37,7 @@ These may be parameterized by:
 class basic_ops(ClusterSetup):
     def setUp(self):
         super(basic_ops, self).setUp()
-
+        return
         self.create_bucket(self.cluster)
 
         self.doc_ops = self.input.param("doc_ops", "").split(";")
