@@ -1338,11 +1338,8 @@ class basic_ops(ClusterSetup):
         self.create_bucket(cluster=self.cluster, bucket_name="bucket_small")
         bucket_big = self.cluster.buckets[0]
         bucket_small = self.cluster.buckets[1]
-        print("big!!!!")
-        print(self.warmup_timeout)
-        print(type(bucket_big))
         doc_gen = doc_generator(self.key, 0, self.num_items,
-                                doc_size=19999)
+                                doc_size=19191)
         load_task = self.task.async_load_gen_docs(
             self.cluster, bucket_big, doc_gen,
             DocLoading.Bucket.DocOps.CREATE, 0,
@@ -1380,21 +1377,17 @@ class basic_ops(ClusterSetup):
             num_reader_threads=1,
             num_storage_threads=1
         )
-        print(target_nodes)
+
         # Create shell_connections
         shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_nodes)
-        print("mid!!!")
         # Perform specified action
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
 
-        print("start!!!")
-        print("true start!!!")
-
         self.assertTrue((not(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, self.warmup_timeout)))
                         and self.bucket_util._wait_warmup_completed([target_nodes], bucket_small),
-                        "Small bucket Warmup blocked by the large one")
-        print("end")
+                        "Bucket with less data not accessible when other bucket getting warmed up.")
+
         shell_conn[target_nodes.ip].disconnect()
 
     def test_MB_41942(self):
