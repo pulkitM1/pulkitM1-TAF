@@ -1321,7 +1321,7 @@ class basic_ops(ClusterSetup):
 
         self.validate_test_failure()
 
-    def test_MB_47267(self):
+    def test_mb_47267(self):
         """
         1. Create a single KV node
         2. Create two buckets A and B
