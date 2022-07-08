@@ -37,7 +37,6 @@ These may be parameterized by:
 class basic_ops(ClusterSetup):
     def setUp(self):
         super(basic_ops, self).setUp()
-        return
         self.create_bucket(self.cluster)
 
         self.doc_ops = self.input.param("doc_ops", "").split(";")
@@ -1348,40 +1347,44 @@ class basic_ops(ClusterSetup):
             eviction_policy="valueOnly",
             bucket_name="small_bucket"
         )
-        bucket_big = self.cluster.buckets[0]
-        bucket_small = self.cluster.buckets[1]
-        # doc_gen = doc_generator(self.key, 0, self.num_items,
-        #                         doc_size=10000)
-        # load_task = self.task.async_load_gen_docs(
-        #     self.cluster, bucket_big, doc_gen,
-        #     DocLoading.Bucket.DocOps.CREATE, 0,
-        #     batch_size=500,
-        #     process_concurrency=8,
-        #     replicate_to=self.replicate_to,
-        #     persist_to=self.persist_to,
-        #     durability=self.durability_level,
-        #     compression=self.sdk_compression,
-        #     timeout_secs=self.sdk_timeout,
-        #     sdk_client_pool=self.sdk_client_pool,
-        #     print_ops_rate=False)
-        # self.task_manager.get_task_result(load_task)
-        #
-        # doc_gen_small = doc_generator(self.key, 0, 1000, doc_size=10000)
-        # load_task_2 = self.task.async_load_gen_docs(
-        #     self.cluster, bucket_small, doc_gen_small,
-        #     DocLoading.Bucket.DocOps.CREATE, 0,
-        #     batch_size=500,
-        #     process_concurrency=8,
-        #     replicate_to=self.replicate_to,
-        #     persist_to=self.persist_to,
-        #     durability=self.durability_level,
-        #     compression=self.sdk_compression,
-        #     timeout_secs=self.sdk_timeout,
-        #     sdk_client_pool=self.sdk_client_pool,
-        #     print_ops_rate=False)
-        # self.task_manager.get_task_result(load_task_2)
-        # self.bucket_util._wait_for_stats_all_buckets(self.cluster,
-        #                                              self.cluster.buckets)
+
+        big_bucket = self.cluster.buckets[0]
+        small_bucket = self.cluster.buckets[1]
+        print("small")
+        print(small_bucket.name)
+        doc_gen = doc_generator(self.key, 0, self.num_items,
+                                doc_size=10)
+        load_task = self.task.async_load_gen_docs(
+            self.cluster, big_bucket, doc_gen,
+            DocLoading.Bucket.DocOps.CREATE, 0,
+            batch_size=500,
+            process_concurrency=8,
+            replicate_to=self.replicate_to,
+            persist_to=self.persist_to,
+            durability=self.durability_level,
+            compression=self.sdk_compression,
+            timeout_secs=self.sdk_timeout,
+            sdk_client_pool=self.sdk_client_pool,
+            print_ops_rate=False)
+        self.task_manager.get_task_result(load_task)
+
+        doc_gen_small = doc_generator(self.key, 0, 500, doc_size=10)
+        load_task_2 = self.task.async_load_gen_docs(
+            self.cluster, small_bucket, doc_gen_small,
+            DocLoading.Bucket.DocOps.CREATE, 0,
+            batch_size=500,
+            process_concurrency=8,
+            replicate_to=self.replicate_to,
+            persist_to=self.persist_to,
+            durability=self.durability_level,
+            compression=self.sdk_compression,
+            timeout_secs=self.sdk_timeout,
+            sdk_client_pool=self.sdk_client_pool,
+            print_ops_rate=False)
+        self.task_manager.get_task_result(load_task_2)
+        self.bucket_util._wait_for_stats_all_buckets(self.cluster,
+                                                     self.cluster.buckets)
+
         target_nodes = choice(self.cluster_util.get_kv_nodes(self.cluster))
         bucket_helper.update_memcached_settings(
             num_reader_threads=1,
@@ -1391,15 +1394,13 @@ class basic_ops(ClusterSetup):
         shell_conn[target_nodes.ip] = RemoteMachineShellConnection(target_nodes)
         # Perform specified action
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
-        error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
+        error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=big_bucket.name)
         print("yo")
-        print(bucket_small.name)
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small))
-        print("mid")
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 10))
+        self.assertTrue(self.bucket_util._wait_warmup_completed([target_nodes], small_bucket)
+                        and (not self.bucket_util._wait_warmup_completed([target_nodes], big_bucket, self.warmup_timeout)),
+                        "Bucket with less data not accessible when other bucket getting warmed up.")
         print("end")
-                        # , "Bucket with less data not accessible when other bucket getting warmed up.")
-
+        # Disconnecting shell_connections
         shell_conn[target_nodes.ip].disconnect()
 
     def test_MB_41942(self):
