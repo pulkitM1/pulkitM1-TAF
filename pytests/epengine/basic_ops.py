@@ -1385,8 +1385,8 @@ class basic_ops(ClusterSetup):
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=bucket_big.name)
 
         self.assertTrue((not(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, self.warmup_timeout)))
-                        and self.bucket_util._wait_warmup_completed([target_nodes], bucket_small),
-                        "Bucket with less data not accessible when other bucket getting warmed up.")
+                        and self.bucket_util._wait_warmup_completed([target_nodes], bucket_small, self.warmup_timeout*5)
+                        , "Bucket with less data not accessible when other bucket getting warmed up.")
 
         shell_conn[target_nodes.ip].disconnect()
 
