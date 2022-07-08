@@ -1331,7 +1331,6 @@ class basic_ops(ClusterSetup):
         6. Verify that we're able to access vbucket state of each vbucket for bucket B before bucket A is fully warmed up.
             With the idea that the warmup of bucket B isn't blocked by the warmup for bucket A despite bucket A having a large number of documents.
         """
-
         shell_conn = dict()
         error_sim = dict()
         bucket_helper = BucketHelper(self.cluster.master)
@@ -1350,10 +1349,9 @@ class basic_ops(ClusterSetup):
 
         big_bucket = self.cluster.buckets[0]
         small_bucket = self.cluster.buckets[1]
-        print("small")
-        print(small_bucket.name)
-        doc_gen = doc_generator(self.key, 0, self.num_items,
-                                doc_size=10)
+
+        # Big bucket docs generation
+        doc_gen = doc_generator(self.key, 0, self.num_items, doc_size=10)
         load_task = self.task.async_load_gen_docs(
             self.cluster, big_bucket, doc_gen,
             DocLoading.Bucket.DocOps.CREATE, 0,
@@ -1368,6 +1366,7 @@ class basic_ops(ClusterSetup):
             print_ops_rate=False)
         self.task_manager.get_task_result(load_task)
 
+        # Small bucket docs generation
         doc_gen_small = doc_generator(self.key, 0, 500, doc_size=10)
         load_task_2 = self.task.async_load_gen_docs(
             self.cluster, small_bucket, doc_gen_small,
@@ -1382,9 +1381,10 @@ class basic_ops(ClusterSetup):
             sdk_client_pool=self.sdk_client_pool,
             print_ops_rate=False)
         self.task_manager.get_task_result(load_task_2)
-        self.bucket_util._wait_for_stats_all_buckets(self.cluster,
-                                                     self.cluster.buckets)
 
+        self.bucket_util._wait_for_stats_all_buckets(self.cluster, self.cluster.buckets)
+
+        # thread manage
         target_nodes = choice(self.cluster_util.get_kv_nodes(self.cluster))
         bucket_helper.update_memcached_settings(
             num_reader_threads=1,
@@ -1395,11 +1395,9 @@ class basic_ops(ClusterSetup):
         # Perform specified action
         error_sim[target_nodes.ip] = CouchbaseError(self.log, shell_conn[target_nodes.ip])
         error_sim[target_nodes.ip].create(CouchbaseError.KILL_MEMCACHED, bucket_name=big_bucket.name)
-        print("yo")
         self.assertTrue(self.bucket_util._wait_warmup_completed([target_nodes], small_bucket)
                         and (not self.bucket_util._wait_warmup_completed([target_nodes], big_bucket, self.warmup_timeout)),
                         "Bucket with less data not accessible when other bucket getting warmed up.")
-        print("end")
         # Disconnecting shell_connections
         shell_conn[target_nodes.ip].disconnect()
 
