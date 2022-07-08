@@ -1348,7 +1348,6 @@ class basic_ops(ClusterSetup):
             eviction_policy="valueOnly",
             bucket_name="small_bucket"
         )
-        self.create_bucket(cluster=self.cluster, bucket_name="bucket_small")
         bucket_big = self.cluster.buckets[0]
         bucket_small = self.cluster.buckets[1]
         # doc_gen = doc_generator(self.key, 0, self.num_items,
