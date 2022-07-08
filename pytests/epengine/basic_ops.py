@@ -1341,8 +1341,14 @@ class basic_ops(ClusterSetup):
             num_storage_threads="default",
             num_reader_threads="default"
         )
-
-        # self.create_bucket(cluster=self.cluster, bucket_name="bucket_small")
+        self.bucket_util.create_default_bucket(
+            self.cluster,
+            ram_quota=100,
+            replica=0,
+            eviction_policy="valueOnly",
+            bucket_name="small_bucket"
+        )
+        self.create_bucket(cluster=self.cluster, bucket_name="bucket_small")
         bucket_big = self.cluster.buckets[0]
         bucket_small = self.cluster.buckets[1]
         # doc_gen = doc_generator(self.key, 0, self.num_items,
@@ -1391,7 +1397,7 @@ class basic_ops(ClusterSetup):
         print(bucket_small.name)
         print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_small))
         print("mid")
-        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 20))
+        print(self.bucket_util._wait_warmup_completed([target_nodes], bucket_big, 10))
         print("end")
                         # , "Bucket with less data not accessible when other bucket getting warmed up.")
 
