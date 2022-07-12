@@ -770,8 +770,9 @@ class RebalanceBaseTest(BaseTestCase):
                     filtered_nodes.append(t_node)
             nodes = filtered_nodes
 
-            status = self.cluster_util.copy_cb_collect_logs(
-                rest, nodes, self.cluster, self.logs_folder)
+            if validate:
+                status = self.cluster_util.copy_cb_collect_logs(
+                    rest, nodes, self.cluster, self.logs_folder)
             if status is False:
                 self.fail("cb_collect zip file copy failed")
 
