@@ -1250,7 +1250,10 @@ class ClusterUtils:
         node_ids = [node.id for node in nodes]
         print("nodes")
         print(node_ids)
-        if 'perNode' in cb_collect_response:
+        print(len(node_ids))
+        print('path' in cb_collect_response['perNode'][node_ids[0]])
+        if 'perNode' in cb_collect_response and len(node_ids) > 0 and 'path' \
+                in cb_collect_response['perNode'][node_ids[0]]:
             for idx, node in enumerate(nodes):
                 self.log.info("%s: Copying cbcollect ZIP file to Client"
                               % node_ids[idx])

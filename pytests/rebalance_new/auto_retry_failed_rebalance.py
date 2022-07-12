@@ -120,6 +120,7 @@ class AutoRetryFailedRebalance(RebalanceBaseTest):
             # Validate cbcollect result after rebalance retry
             self.cbcollect_info(trigger=False, validate=True,
                                 known_failures=self.cb_collect_failure_nodes)
+            print("both done")
             if self.data_load:
                 self.data_validation(tasks)
         else:
