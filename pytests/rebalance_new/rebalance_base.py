@@ -731,6 +731,9 @@ class RebalanceBaseTest(BaseTestCase):
 
     def cbcollect_info(self, trigger=True, validate=True,
                        known_failures=dict()):
+        print("inside cbcollect_info ")
+        print(trigger)
+        print(validate)
         rest = RestConnection(self.cluster.master)
         nodes = rest.get_nodes()
         if trigger:

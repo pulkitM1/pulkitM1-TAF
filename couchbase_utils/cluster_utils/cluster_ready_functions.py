@@ -1204,6 +1204,7 @@ class ClusterUtils:
         return rest.create_stats_snapshhot()
 
     def trigger_cb_collect_on_cluster(self, rest, nodes, single_node=False):
+        print("triggered cb collect")
         params = dict()
         node_ids = [node.id for node in nodes]
         params['nodes'] = ",".join(node_ids)
