@@ -743,6 +743,8 @@ class RebalanceBaseTest(BaseTestCase):
                 self.fail("API perform_cb_collect returned False")
         if validate:
             status = self.cluster_util.wait_for_cb_collect_to_complete(rest, retry_count=1200)
+            print("cb collect status")
+            print(status)
             if status is False:
                 self.fail("cb_collect timed out")
 
@@ -771,6 +773,8 @@ class RebalanceBaseTest(BaseTestCase):
             nodes = filtered_nodes
             status = self.cluster_util.copy_cb_collect_logs(
                 rest, nodes, self.cluster, self.logs_folder)
+            print("cb logs collect status")
+            print(status)
 
             if status is False:
                 self.fail("cb_collect zip file copy failed")
