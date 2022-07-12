@@ -1240,19 +1240,27 @@ class ClusterUtils:
         return status
 
     def copy_cb_collect_logs(self, rest, nodes, cluster, log_path):
+        print("inside cluster ready functions")
         status = True
         cb_collect_response = rest.ns_server_tasks("clusterLogsCollection")
+        print("cbcollect response ->")
+        print(cb_collect_response)
         self.log.debug(cb_collect_response)
         node_ids = [node.id for node in nodes]
+        print("nodes")
+        print(node_ids)
         if 'perNode' in cb_collect_response:
             for idx, node in enumerate(nodes):
                 self.log.info("%s: Copying cbcollect ZIP file to Client"
                               % node_ids[idx])
+                print("%s: Copying cbcollect ZIP file to Client"
+                      % node_ids[idx])
                 server = [server for server in cluster.servers if
                           server.ip == node.ip][0]
                 remote_client = RemoteMachineShellConnection(server)
                 cb_collect_path = \
                     cb_collect_response['perNode'][node_ids[idx]]['path']
+                print(cb_collect_response['perNode'][node_ids[idx]]['path'])
                 if remote_client.info.type.lower() == "windows":
                     cb_collect_path = cb_collect_path \
                         .replace(":", "") \
