@@ -887,6 +887,7 @@ class CollectionsRebalance(CollectionBase):
             self.wait_for_compaction_to_complete()
 
     def data_validation_collection(self):
+        print("data_validation_collection")
         num_zone = 1
         if self.cluster_util.is_enterprise_edition(self.cluster):
             nodes_in_zones = self.get_zone_info()
@@ -894,6 +895,7 @@ class CollectionsRebalance(CollectionBase):
 
             if num_zone > 1:
                 for bucket in self.cluster.buckets:
+                    print("data_validation_collection_for")
                     self.cluster_util.verify_replica_distribution_in_zones(
                         self.cluster, nodes_in_zones, bucket=bucket.name)
                 self.bucket_util.verify_vbucket_distribution_in_zones(

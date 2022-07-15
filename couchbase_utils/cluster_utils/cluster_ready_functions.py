@@ -1021,6 +1021,7 @@ class ClusterUtils:
                     output, error = shell.execute_command(commands)
                 elif versions[0][:5] in testconstants.COUCHBASE_VERSION_3 or \
                         versions[0][:5] in testconstants.COUCHBASE_FROM_VERSION_4:
+                    print("version found!")
                     command = "dcp"
                     if not info == 'windows':
                         commands = "%s %s:%s -u %s -p \"%s\" %s -b %s  | grep :replication:ns_1@%s |  grep vb_uuid | \
@@ -1033,6 +1034,7 @@ class ClusterUtils:
                                         node, node)
                         output, error = shell.execute_command(commands)
                     else:
+                        print("windows confirmed!")
                         commands = "%s %s:%s -u %s -p \"%s\" %s -b %s  | grep.exe :replication:ns_1@%s |  grep vb_uuid | \
                                     gawk.exe '{print $1}' | sed.exe 's/eq_dcpq:replication:ns_1@%s->ns_1@//g' | \
                                     sed.exe 's/:.*//g' \
@@ -1042,6 +1044,8 @@ class ClusterUtils:
                                         command, bucket,
                                         node, node)
                         output, error = shell.execute_command(commands)
+                        print("inside fault")
+                        print(output)
                         output = sorted(set(output))
                 shell.log_command_output(output, error)
                 output = output[0].split(" ")
