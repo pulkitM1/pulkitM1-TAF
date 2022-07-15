@@ -1057,7 +1057,7 @@ class ClusterUtils:
                 print(output)
                 print(set(output))
                 print(set(nodes[group]).isdisjoint(set(output)))
-                print(set(nodes[group]).isdisjoint(set(output.append(node))))
+                print(set(nodes[group]).isdisjoint({node}))
                 if set(nodes[group]).isdisjoint(set(output)):
                     self.log.debug("{0}".format(nodes))
                     self.log.debug("replicas of node {0} are in nodes {1}"
