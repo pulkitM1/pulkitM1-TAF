@@ -986,7 +986,7 @@ class CollectionsRebalance(CollectionBase):
 
     def update_replica_and_validate_vbuckets(self):
         """ update replica, rebalance and validate vbucket distribution"""
-        for replica in range(4):
+        for replica in range(1, 4):
             self.log.info("updating replica to {0}".format(replica))
             self.bucket_util.update_all_bucket_replicas(
                 self.cluster, replica)
@@ -994,7 +994,7 @@ class CollectionsRebalance(CollectionBase):
             self.task.rebalance(self.cluster.servers[:self.nodes_init], [], [],
                                 retry_get_process_num=self.retry_get_process_num)
             print("called are bhai bs kro!")
-            #self.data_validation_collection()
+            self.data_validation_collection()
 
     def check_balanced_attribute(self, balanced=True):
         content = self.rest.cluster_status()
