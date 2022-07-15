@@ -896,9 +896,9 @@ class CollectionsRebalance(CollectionBase):
             if num_zone > 1:
                 for bucket in self.cluster.buckets:
                     print("data_validation_collection_for")
-                    print(bucket.replicaNumber)
-                    self.cluster_util.verify_replica_distribution_in_zones(
-                        self.cluster, nodes_in_zones, bucket=bucket.name)
+                    if bucket.replicaNumber > 0:
+                        self.cluster_util.verify_replica_distribution_in_zones(
+                            self.cluster, nodes_in_zones, bucket=bucket.name)
                 self.bucket_util.verify_vbucket_distribution_in_zones(
                     self.cluster, nodes_in_zones, self.servers)
         if not self.skip_validations:
@@ -987,7 +987,7 @@ class CollectionsRebalance(CollectionBase):
 
     def update_replica_and_validate_vbuckets(self):
         """ update replica, rebalance and validate vbucket distribution"""
-        for replica in range(1, 4):
+        for replica in range(4):
             self.log.info("updating replica to {0}".format(replica))
             self.bucket_util.update_all_bucket_replicas(
                 self.cluster, replica)
