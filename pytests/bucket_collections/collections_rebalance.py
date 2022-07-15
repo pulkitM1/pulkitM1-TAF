@@ -994,7 +994,7 @@ class CollectionsRebalance(CollectionBase):
             self.task.rebalance(self.cluster.servers[:self.nodes_init], [], [],
                                 retry_get_process_num=self.retry_get_process_num)
             print("called are bhai bs kro!")
-            self.data_validation_collection()
+            #self.data_validation_collection()
 
     def check_balanced_attribute(self, balanced=True):
         content = self.rest.cluster_status()
