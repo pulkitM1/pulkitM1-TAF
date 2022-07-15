@@ -896,7 +896,7 @@ class CollectionsRebalance(CollectionBase):
             if num_zone > 1:
                 for bucket in self.cluster.buckets:
                     print("data_validation_collection_for")
-                    print(bucket)
+                    print(bucket.replicaNumber)
                     self.cluster_util.verify_replica_distribution_in_zones(
                         self.cluster, nodes_in_zones, bucket=bucket.name)
                 self.bucket_util.verify_vbucket_distribution_in_zones(
