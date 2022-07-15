@@ -964,7 +964,9 @@ class CollectionsRebalance(CollectionBase):
         # Verify replicas of one node should not be in the same zone
         # as active vbuckets of the node.
         self.data_validation_collection()
+        print("called once !!!")
         if load_data:
+            print("called again !!!")
             self.sync_data_load()
             self.data_validation_collection()
 
@@ -979,6 +981,7 @@ class CollectionsRebalance(CollectionBase):
                               node.ip, node.port, zone_name=zone_name, services=["kv"])
         self.task.rebalance(self.cluster.servers[:self.nodes_init], [], [],
                             retry_get_process_num=self.retry_get_process_num)
+        print("called once more!!")
         self.data_validation_collection()
 
     def update_replica_and_validate_vbuckets(self):
@@ -990,6 +993,7 @@ class CollectionsRebalance(CollectionBase):
             self.bucket_util.print_bucket_stats(self.cluster)
             self.task.rebalance(self.cluster.servers[:self.nodes_init], [], [],
                                 retry_get_process_num=self.retry_get_process_num)
+            print("called are bhai bs kro!")
             self.data_validation_collection()
 
     def check_balanced_attribute(self, balanced=True):
@@ -1119,12 +1123,14 @@ class CollectionsRebalance(CollectionBase):
         if not self.warmup:
             self.wait_for_rebalance_to_complete(rebalance)
         if self.data_load_stage == "during" or self.data_load_stage == "before":
+            print("called again once!!")
             if self.data_load_type == "async":
                 # for failover + before + async, wait_for_async_data_load_to_complete is already done
                 if self.data_load_stage == "before" and rebalance_operation in self.failover_ops:
                     pass
                 else:
                     self.wait_for_async_data_load_to_complete(tasks)
+            print("called for async!!")
             self.data_validation_collection()
         if self.num_zone > 1:
             self.check_balanced_attribute()
