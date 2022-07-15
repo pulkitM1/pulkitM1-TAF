@@ -978,6 +978,7 @@ class ClusterUtils:
         table.display("Cluster statistics")
 
     def verify_replica_distribution_in_zones(self, cluster, nodes, bucket="default"):
+        print("inside verification method!!")
         """
         Verify the replica distribution in nodes in different zones.
         Validate that no replicas of a node are in the same zone.
@@ -1000,6 +1001,8 @@ class ClusterUtils:
         else:
             raise Exception("OS not supported.")
         versions = rest.get_nodes_versions()
+        print("g$$^")
+        print(nodes)
         for group in nodes:
             for node in nodes[group]:
                 if versions[0][:5] in testconstants.COUCHBASE_VERSION_2:
@@ -1047,8 +1050,11 @@ class ClusterUtils:
                         print("inside fault")
                         print(output)
                         output = sorted(set(output))
+                print("node end!")
+                print(node)
                 shell.log_command_output(output, error)
                 output = output[0].split(" ")
+                print(output)
                 if set(nodes[group]).isdisjoint(set(output)):
                     self.log.debug("{0}".format(nodes))
                     self.log.debug("replicas of node {0} are in nodes {1}"
