@@ -1053,7 +1053,7 @@ class ClusterUtils:
                 print("node end!")
                 print(node)
                 shell.log_command_output(output, error)
-                output = output[0].split(" ")
+                output = output.strip()
                 print(output)
                 if set(nodes[group]).isdisjoint(set(output)):
                     self.log.debug("{0}".format(nodes))
