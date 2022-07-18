@@ -1613,11 +1613,15 @@ class basic_ops(ClusterSetup):
             while doc_gen.has_next():
                 d_key, val = doc_gen.next()
                 client.crud(DocLoading.Bucket.DocOps.CREATE, d_key, val)
-            print("output!!!!")
+            print("output!!*!")
             output, _ = shell.execute_command(hash_dump_cmd)
             print(output)
-            if output == [] or "X.. .D..Cm" in output[0] :
-                is_resident = False
+            print("output!*!!")
+            output, _ = shell.execute_command(hash_dump_cmd)
+            print(output)
+            if output == [] or "X.. .D..Cm" in output[0]:
+                pass
+                #is_resident = False
             start_index = doc_gen.key_counter
             num_items += batch_size
 
