@@ -1602,13 +1602,16 @@ class basic_ops(ClusterSetup):
 
         # Loading docs until the target doc is evicted from memory
         while is_resident:
+            print("inside while")
+            print(is_resident)
             doc_gen = doc_generator("docs", start_index, batch_size,
                                     key_size=100, doc_size=10240,
                                     target_vbucket=[key_vb])
             while doc_gen.has_next():
                 d_key, val = doc_gen.next()
                 client.crud(DocLoading.Bucket.DocOps.CREATE, d_key, val)
-
+            print("output!!!!")
+            print(output)
             output, _ = shell.execute_command(hash_dump_cmd)
             if " X.. .D..Cm " in output[0]:
                 is_resident = False
