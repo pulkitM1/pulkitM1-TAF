@@ -1601,6 +1601,9 @@ class basic_ops(ClusterSetup):
                self.cluster.master.memcached_port, key_vb, key)
 
         # Loading docs until the target doc is evicted from memory
+        output, _ = shell.execute_command(hash_dump_cmd)
+        print("okokok")
+        print(output)
         while is_resident:
             print("inside while")
             print(is_resident)
@@ -1613,7 +1616,7 @@ class basic_ops(ClusterSetup):
             print("output!!!!")
             output, _ = shell.execute_command(hash_dump_cmd)
             print(output)
-            if " X.. .D..Cm " in output[0]:
+            if output == [] or "X.. .D..Cm" in output[0] :
                 is_resident = False
             start_index = doc_gen.key_counter
             num_items += batch_size
