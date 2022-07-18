@@ -1611,8 +1611,8 @@ class basic_ops(ClusterSetup):
                 d_key, val = doc_gen.next()
                 client.crud(DocLoading.Bucket.DocOps.CREATE, d_key, val)
             print("output!!!!")
-            print(output)
             output, _ = shell.execute_command(hash_dump_cmd)
+            print(output)
             if " X.. .D..Cm " in output[0]:
                 is_resident = False
             start_index = doc_gen.key_counter
