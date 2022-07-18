@@ -1604,6 +1604,10 @@ class basic_ops(ClusterSetup):
         output, _ = shell.execute_command(hash_dump_cmd)
         print("okokok")
         print(output)
+        print("output!")
+        output, _ = shell.execute_command(hash_dump_cmd)
+        print(output)
+        i = 0
         while is_resident:
             print("inside while")
             print(is_resident)
@@ -1613,17 +1617,14 @@ class basic_ops(ClusterSetup):
             while doc_gen.has_next():
                 d_key, val = doc_gen.next()
                 client.crud(DocLoading.Bucket.DocOps.CREATE, d_key, val)
-            print("output!!*!")
             output, _ = shell.execute_command(hash_dump_cmd)
-            print(output)
             print("output!*!!")
-            output, _ = shell.execute_command(hash_dump_cmd)
             print(output)
-            if output == [] or "X.. .D..Cm" in output[0]:
-                pass
-                #is_resident = False
+            if i == 7: #or "X.. .D..Cm" in output[0]:pass
+                is_resident = False
             start_index = doc_gen.key_counter
             num_items += batch_size
+            i += 1
 
         result = self.task.rebalance([self.cluster.master], [in_node], [])
         self.assertTrue(result, "Rebalance_in failed")
