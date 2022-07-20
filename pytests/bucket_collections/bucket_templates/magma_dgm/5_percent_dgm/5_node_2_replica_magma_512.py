@@ -22,7 +22,7 @@ spec = {
     Bucket.compressionMode: Bucket.CompressionMode.ACTIVE,
     "buckets": {
         "default": {
-            MetaConstants.NUM_SCOPES_PER_BUCKET: 60,
+            MetaConstants.NUM_SCOPES_PER_BUCKET: 81,
             MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 3,
             MetaConstants.NUM_ITEMS_PER_COLLECTION: 10,
             Bucket.ramQuotaMB: 356,
