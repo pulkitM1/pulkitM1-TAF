@@ -805,6 +805,11 @@ class DocLoaderUtils(object):
         sleep(doc_expiry_time, "Wait for docs to get expire as per TTL")
 
     @staticmethod
+    def test_method(input_spec):
+        print("test_method")
+        print(input_spec)
+
+    @staticmethod
     def run_scenario_from_spec(task_manager, cluster, buckets,
                                input_spec,
                                batch_size=200,
@@ -827,6 +832,10 @@ class DocLoaderUtils(object):
                                   DocLoaderUtils.perform_doc_loading_for_spec
         """
         print("inside this method !!!!")
+        print(input_spec)
+        DocLoaderUtils.test_method(input_spec)
+        print("after")
+        print(input_spec)
         cmd = "cat /etc/couchbase.d/config_profile"
         shell = RemoteMachineShellConnection(cluster.master)
         output, _ = shell.execute_command(cmd)
