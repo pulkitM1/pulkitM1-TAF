@@ -827,10 +827,10 @@ class DocLoaderUtils(object):
                                   DocLoaderUtils.perform_doc_loading_for_spec
         """
         print("inside this method !!!!")
-        print(CbServer.cluster_profile)
         cmd = "cat /etc/couchbase.d/config_profile"
         shell = RemoteMachineShellConnection(cluster.master)
         output, _ = shell.execute_command(cmd)
+        print(output)
         if output and output[0].strip() == "serverless":
             print("its serverless!!!")
         else:
