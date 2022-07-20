@@ -826,6 +826,11 @@ class DocLoaderUtils(object):
         :return doc_loading_task: Task object returned from
                                   DocLoaderUtils.perform_doc_loading_for_spec
         """
+        print("inside this method !!!!")
+        if CbServer.cluster_profile == "serverless":
+            print("its serverless!!!")
+        else:
+            print("its not serverless")
         op_details = BucketUtils.perform_tasks_from_spec(cluster,
                                                          buckets,
                                                          input_spec)
