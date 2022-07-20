@@ -25,7 +25,7 @@ spec = {
             MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
             MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 25,
             MetaConstants.NUM_ITEMS_PER_COLLECTION: 1300,
-            Bucket.ramQuotaMB: 312,
+            Bucket.ramQuotaMB: 256,
             Bucket.storageBackend: Bucket.StorageBackend.magma,
             Bucket.priority: Bucket.Priority.HIGH
         },
@@ -33,13 +33,13 @@ spec = {
             MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
             MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 10,
             MetaConstants.NUM_ITEMS_PER_COLLECTION: 500,
-            Bucket.ramQuotaMB: 200
+            Bucket.ramQuotaMB: 256
         },
         "bucket2": {
             MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
             MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 10,
             MetaConstants.NUM_ITEMS_PER_COLLECTION: 500,
-            Bucket.ramQuotaMB: 100,
+            Bucket.ramQuotaMB: 256,
             Bucket.storageBackend: Bucket.StorageBackend.magma
         }
     }
