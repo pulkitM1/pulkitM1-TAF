@@ -126,7 +126,13 @@ class CollectionBase(ClusterSetup):
                 req_clients=req_clients,
                 compression_settings=sdk_compression)
 
+    def spec_for_serverless(self, bucket_spec):
+        print("inside method")
+        print(bucket_spec)
+        print(bucket_spec[Bucket.ramQuotaMB])
+
     def collection_setup(self):
+        print("inside reel method!!!!")
         self.bucket_util.add_rbac_user(self.cluster.master)
 
         # Create bucket(s) and add rbac user
@@ -156,6 +162,8 @@ class CollectionBase(ClusterSetup):
         # Process params to over_ride values if required
         self.over_ride_bucket_template_params(buckets_spec)
         self.over_ride_doc_loading_template_params(doc_loading_spec)
+        self.spec_for_serverless(buckets_spec)
+        print("out")
         self.set_retry_exceptions_for_initial_data_load(doc_loading_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
                                                         buckets_spec)
