@@ -827,6 +827,7 @@ class DocLoaderUtils(object):
                                   DocLoaderUtils.perform_doc_loading_for_spec
         """
         print("inside this method !!!!")
+        print(CbServer.cluster_profile)
         if CbServer.cluster_profile == "serverless":
             print("its serverless!!!")
         else:
