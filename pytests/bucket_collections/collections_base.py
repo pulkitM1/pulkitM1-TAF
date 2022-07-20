@@ -132,7 +132,30 @@ class CollectionBase(ClusterSetup):
     def spec_for_serverless(self, bucket_spec):
         print("inside method")
         print(bucket_spec)
-        print(bucket_spec[Bucket.ramQuotaMB])
+        new_collection_per_scope_number = None
+        new_scope_number = None
+        print(bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET])
+        print(bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE])
+        if bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] > 100 or \
+                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] > 100:
+
+            new_collection_per_scope_number = min(bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE],80)
+            new_scope_number = min(bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET],80)
+
+            bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = \
+                (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
+                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) / \
+                (new_collection_per_scope_number * new_scope_number)
+
+            bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] = new_collection_per_scope_number
+            bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = new_scope_number
+
+            print("print")
+            print(new_scope_number)
+            print(new_collection_per_scope_number)
+            print(bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION])
+
+
 
     def collection_setup(self):
         print("inside reel method!!!!")
