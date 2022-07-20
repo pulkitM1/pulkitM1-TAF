@@ -22,16 +22,16 @@ spec = {
     Bucket.compressionMode: Bucket.CompressionMode.ACTIVE,
     "buckets": {
         "default": {
-            MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
-            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 25,
-            MetaConstants.NUM_ITEMS_PER_COLLECTION: 1300,
+            MetaConstants.NUM_SCOPES_PER_BUCKET: 81,
+            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 81,
+            MetaConstants.NUM_ITEMS_PER_COLLECTION: 300,
             Bucket.ramQuotaMB: 256,
             Bucket.storageBackend: Bucket.StorageBackend.magma,
             Bucket.priority: Bucket.Priority.HIGH
         },
         "bucket1": {
-            MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
-            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 10,
+            MetaConstants.NUM_SCOPES_PER_BUCKET: 100,
+            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 100,
             MetaConstants.NUM_ITEMS_PER_COLLECTION: 500,
             Bucket.ramQuotaMB: 256
         },
