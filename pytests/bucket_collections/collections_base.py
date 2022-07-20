@@ -16,7 +16,9 @@ from java.lang import Exception as Java_base_exception
 
 class CollectionBase(ClusterSetup):
     def setUp(self):
+        print("before setup")
         super(CollectionBase, self).setUp()
+        print("After setup")
         self.log_setup_status("CollectionBase", "started")
 
         self.key = 'test_collection'.rjust(self.key_size, '0')
@@ -66,6 +68,7 @@ class CollectionBase(ClusterSetup):
                                                    num_reader_threads="disk_io_optimized")
 
         try:
+            print("on setup")
             self.collection_setup()
         except Java_base_exception as exception:
             self.handle_setup_exception(exception)
@@ -137,6 +140,7 @@ class CollectionBase(ClusterSetup):
 
         # Create bucket(s) and add rbac user
         if self.bucket_storage == Bucket.StorageBackend.magma:
+            print("inside if")
             # get the TTL value
             buckets_spec_from_conf = \
                 self.bucket_util.get_bucket_template_from_package(
@@ -149,7 +153,7 @@ class CollectionBase(ClusterSetup):
                 self.bucket_util.get_bucket_template_from_package(
                     self.spec_name)
             magma_bucket_spec[Bucket.maxTTL] = bucket_ttl
-            buckets_spec = magma_bucket_spec
+            buckets_spec = buckets_spec_from_conf
         else:
             buckets_spec = self.bucket_util.get_bucket_template_from_package(
                 self.spec_name)
