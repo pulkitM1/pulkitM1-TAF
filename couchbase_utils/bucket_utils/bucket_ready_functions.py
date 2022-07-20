@@ -4899,7 +4899,7 @@ class BucketUtils(ScopeUtils):
                 self.drop_scope(cluster.master,
                                 bucket,
                                 scope_name=scope.name)
-
+#aaaaaaaaaaaaaaaaaaa
     @staticmethod
     def perform_tasks_from_spec(cluster, buckets, input_spec):
         """
@@ -4945,12 +4945,19 @@ class BucketUtils(ScopeUtils):
             scope_counter = Bucket.scope_counter
             col_counter = Bucket.collection_counter
             if operation_type == "create":
+                print("inside create")
                 scopes_num = ops_spec["scopes_num"]
+                print(scopes_num)
                 collection_count = \
                     ops_spec["collection_count_under_each_scope"]
+                print(collection_count)
+                print("bucket name")
                 for bucket_name in buckets_spec:
+                    print(bucket_name)
                     bucket = BucketUtils.get_bucket_obj(buckets,
                                                         bucket_name)
+                    print("bucket object")
+                    print(bucket)
                     if bucket_name not in ops_details["scopes_added"]:
                         ops_details["scopes_added"][bucket_name] = dict()
                         ops_details["scopes_added"][bucket_name][
@@ -4992,6 +4999,8 @@ class BucketUtils(ScopeUtils):
                         "scopes"].update(created_scope_collection_details)
                     ops_details["collections_added"][bucket_name][
                         "scopes"].update(created_scope_collection_details)
+                    print("added!")
+                    print(created_scope_collection_details)
             elif operation_type == "drop":
                 update_ops_details_dict("scopes_dropped", buckets_spec,
                                         fetch_collections=True)
@@ -5192,7 +5201,7 @@ class BucketUtils(ScopeUtils):
             input_spec.get(MetaCrudParams.SCOPES_TO_ADD_PER_BUCKET, 0)
         create_scope_spec["collection_count_under_each_scope"] = \
             input_spec.get(MetaCrudParams.COLLECTIONS_TO_ADD_FOR_NEW_SCOPES, 0)
-        perform_scope_operation("create", create_scope_spec)
+        perform_scope_operation("create", create_scope_spec)#bbbbbbbbb
 
         # Fetch random Scopes under which to create collections, and create them
         scopes_to_create_collections = BucketUtils.get_random_scopes(
