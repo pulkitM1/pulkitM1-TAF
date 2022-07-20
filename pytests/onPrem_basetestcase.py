@@ -94,6 +94,8 @@ class OnPremBaseTest(CouchbaseBaseTest):
         self.ipv4_only = self.input.param("ipv4_only", False)
         self.ipv6_only = self.input.param("ipv6_only", False)
         self.multiple_ca = self.input.param("multiple_ca", False)
+        # This is user defined throttling limit used specifically in serverless config
+        self.kv_throttling_limit = self.input.param("kv_throttling_limit", 200000)
 
         self.node_utils.cleanup_pcaps(self.servers)
         self.collect_pcaps = self.input.param("collect_pcaps", False)
@@ -115,6 +117,28 @@ class OnPremBaseTest(CouchbaseBaseTest):
 
         self.nonroot = False
         self.crash_warning = self.input.param("crash_warning", False)
+
+        self.cluster_util = ClusterUtils(self.task_manager)
+        self.bucket_util = BucketUtils(self.cluster_util, self.task)
+
+        # Fetch the profile_type from the master node
+        # Value will be default / serverless
+        CbServer.cluster_profile = self.cluster_util.get_server_profile_type(
+            self.servers[0])
+
+        if self.use_https or CbServer.cluster_profile == "serverless":
+            CbServer.use_https = True
+            trust_all_certs()
+
+        # Enable use_https and enforce_tls for 'serverless' cluster testing
+        # And set default bucket/cluster setting values to tests
+        if CbServer.cluster_profile == "serverless":
+            self.use_https = True
+            self.enforce_tls = True
+
+            self.bucket_storage = Bucket.StorageBackend.magma
+            self.num_replicas = Bucket.ReplicaNum.TWO
+            self.server_groups = "test_zone_1:test_zone_2:test_zone_3"
 
         # Populate memcached_port in case of cluster_run
         cluster_run_base_port = ClusterRun.port
@@ -150,28 +174,10 @@ class OnPremBaseTest(CouchbaseBaseTest):
         # Initialize self.cluster with first available cluster as default
         self.cluster = self.cb_clusters[cluster_name_format
                                         % default_cluster_index]
-        self.cluster_util = ClusterUtils(self.task_manager)
-        self.bucket_util = BucketUtils(self.cluster_util, self.task)
-
         CbServer.enterprise_edition = \
             self.cluster_util.is_enterprise_edition(self.cluster)
         self.cluster.edition = "enterprise" \
             if CbServer.enterprise_edition else "community"
-
-        # Fetch the profile_type from the master node
-        # Value will be default / serverless
-        CbServer.cluster_profile = self.cluster_util.get_server_profile_type(
-            self.cluster.master)
-
-        # Enable use_https and enforce_tls for 'serverless' cluster testing
-        # And set default bucket/cluster setting values to tests
-        if CbServer.cluster_profile == "serverless":
-            self.use_https = True
-            self.enforce_tls = True
-
-            self.bucket_storage = Bucket.StorageBackend.magma
-            self.num_replicas = Bucket.ReplicaNum.TWO
-            self.server_groups = "test_zone_1:test_zone_2:test_zone_3"
 
         if self.standard_buckets > 10:
             self.bucket_util.change_max_buckets(self.cluster.master,
@@ -259,10 +265,6 @@ class OnPremBaseTest(CouchbaseBaseTest):
                          for server in self.cluster.server]
                 for task in tasks:
                     self.task_manager.get_task_result(task)
-
-            if self.use_https:
-                CbServer.use_https = True
-                trust_all_certs()
 
             # Enforce tls on nodes of all clusters
             if self.use_https and self.enforce_tls:
@@ -906,6 +908,10 @@ class ClusterSetup(OnPremBaseTest):
                 if self.get_cbcollect_info:
                     self.fetch_cb_collect_logs()
                 self.fail("Initial rebalance failed")
+
+        if CbServer.cluster_profile == "serverless":
+            # Workaround to hitting throttling on serverless config
+            _, status = RestConnection(self.cluster.master).set_throttle_limit(limit=self.kv_throttling_limit)
 
         # Used to track spare nodes.
         # Test case can use this for further rebalance
