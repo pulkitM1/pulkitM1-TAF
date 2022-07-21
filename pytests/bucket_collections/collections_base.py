@@ -149,6 +149,8 @@ class CollectionBase(ClusterSetup):
                 bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > 100:
             new_collection_per_scope_number = self.get_divisor(80)
             new_scope_number = 80 / new_collection_per_scope_number
+            print("yoy#")
+            print(new_collection_per_scope_number)
 
             bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = math.ceil((
                     bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] *
