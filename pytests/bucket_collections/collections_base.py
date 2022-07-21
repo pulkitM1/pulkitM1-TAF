@@ -140,7 +140,8 @@ class CollectionBase(ClusterSetup):
             if percentage_max_limits % i == 0:
                 factor_list.append(i)
             i = i + 1
-        return factor_list[math.ceil(len(factor_list)/2)]
+        index = (len(factor_list)//2)
+        return factor_list[index]
 
     def balance_scopes_collections_items(self, bucket_spec):
         new_collection_per_scope_number = None
