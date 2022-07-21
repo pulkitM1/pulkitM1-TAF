@@ -2001,6 +2001,8 @@ class BucketUtils(ScopeUtils):
                                                   async_create=async_create))
 
         for task in bucket_creation_tasks:
+            print("bucket created!")
+            print(task)
             self.task_manager.get_task_result(task)
             if task.result is False:
                 self.log.error("Failure in bucket creation task: %s"
