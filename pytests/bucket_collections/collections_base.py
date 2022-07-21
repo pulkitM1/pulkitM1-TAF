@@ -237,8 +237,8 @@ class CollectionBase(ClusterSetup):
         print("server!")
         print(CbServer.cluster_profile)
         if CbServer.cluster_profile == "serverless":
-            # self.specs_for_serverless(buckets_spec)
-            pass
+            self.specs_for_serverless(buckets_spec)
+
 
         print("out")
         self.set_retry_exceptions_for_initial_data_load(doc_loading_spec)
