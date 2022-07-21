@@ -146,14 +146,15 @@ class CollectionBase(ClusterSetup):
         return_index = (len(factor_list)//2)
         return factor_list[return_index]
 
-    def balance_scopes_collections_items(self, bucket_spec):
+    def balance_scopes_collections_items(self, bucket_spec, bucket_name):
         new_collection_per_scope_number = None
         new_scope_number = None
         if (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
                 bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > \
                 self.percentage_max_limits:
             self.log.info("Readjusting scopes, collections, items in bucket "
-                          "to adhere to serverless constraints")
+                          "to adhere to serverless constraints for"
+                          "{0}".format())
 
             # scope and collections limits according to percentage_max_limits
             new_collection_per_scope_number = \
@@ -185,7 +186,7 @@ class CollectionBase(ClusterSetup):
         new_scope_number = None
         print("\n")
         print(bucket_spec)
-        self.balance_scopes_collections_items(bucket_spec)
+        self.balance_scopes_collections_items(bucket_spec, "default")
         print("after!!@@")
         print(bucket_spec)
 
@@ -195,7 +196,7 @@ class CollectionBase(ClusterSetup):
                 print("\n")
                 print(bucket_spec["buckets"][bucket])
                 self.balance_scopes_collections_items(bucket_spec["buckets"][
-                                                     bucket])
+                                                     bucket], bucket)
                 print("after")
                 print(bucket_spec["buckets"][bucket])
                 print("\n")
