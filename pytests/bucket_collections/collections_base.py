@@ -164,8 +164,16 @@ class CollectionBase(ClusterSetup):
         print(bucket_spec)
 
         print(bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION])
-        for bucket in bucket_spec["buckets"]:
-            print(bucket)
+        if "buckets" in bucket_spec:
+            for bucket in bucket_spec["buckets"]:
+                print("\n")
+                print(bucket)
+                self.balance_scopes_collections(bucket)
+                print("after")
+                print(bucket)
+                print("\n")
+                print(bucket_spec)
+
 
 
 
