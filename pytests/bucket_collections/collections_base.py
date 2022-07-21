@@ -154,7 +154,7 @@ class CollectionBase(ClusterSetup):
                 self.percentage_max_limits:
             self.log.info("Readjusting scopes, collections, items in bucket "
                           "to adhere to serverless constraints for"
-                          "{0}".format(bucket_name))
+                          " {0}".format(bucket_name))
 
             # scope and collections limits according to percentage_max_limits
             new_collection_per_scope_number = \
