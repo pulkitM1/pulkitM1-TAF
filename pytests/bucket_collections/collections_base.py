@@ -129,33 +129,43 @@ class CollectionBase(ClusterSetup):
                 req_clients=req_clients,
                 compression_settings=sdk_compression)
 
+    def balance_scopes_collections(self, bucket_spec):
+        new_collection_per_scope_number = None
+        new_scope_number = None
+        if bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] > 100 or \
+                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] > 100:
+            new_collection_per_scope_number = \
+                min(bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE], 80)
+            new_scope_number = \
+                min(bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET], 80)
+
+            bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = ((
+                    bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] *
+                    bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
+                    bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) /
+                   (new_collection_per_scope_number * new_scope_number))
+
+            bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] = \
+                new_collection_per_scope_number
+            bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = new_scope_number
+            print("print")
+            print(new_scope_number)
+            print(new_collection_per_scope_number)
+
+
     def spec_for_serverless(self, bucket_spec):
         print("inside method")
         print(bucket_spec)
         new_collection_per_scope_number = None
         new_scope_number = None
-        print(bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET])
-        print(bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE])
-        if bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] > 100 or \
-                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] > 100:
+        print(bucket_spec)
+        self.balance_scopes_collections(bucket_spec)
+        print("after")
+        print(bucket_spec)
 
-            new_collection_per_scope_number = min(bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE],80)
-            new_scope_number = min(bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET],80)
-
-            bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = \
-                (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
-                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) / \
-                (new_collection_per_scope_number * new_scope_number)
-
-            bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] = new_collection_per_scope_number
-            bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = new_scope_number
-
-            print("print")
-            print(new_scope_number)
-            print(new_collection_per_scope_number)
-            print(bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION])
-            for bucket in bucket_spec["buckets"]:
-                print(bucket)
+        print(bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION])
+        for bucket in bucket_spec["buckets"]:
+            print(bucket)
 
 
 
