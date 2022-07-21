@@ -172,8 +172,8 @@ class CollectionBase(ClusterSetup):
         new_scope_number = None
         print("\n")
         print(bucket_spec)
-        self.balance_scopes_collections(bucket_spec)
-        print("after")
+        self.balance_scopes_collections_items(bucket_spec)
+        print("after!!@@")
         print(bucket_spec)
 
         print(bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION])
