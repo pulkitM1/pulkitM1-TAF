@@ -1,3 +1,4 @@
+import math
 from math import ceil
 
 from Cb_constants import CbServer, DocLoading
@@ -129,17 +130,27 @@ class CollectionBase(ClusterSetup):
                 req_clients=req_clients,
                 compression_settings=sdk_compression)
 
-    def balance_scopes_collections(self, bucket_spec):
+    @staticmethod
+    def get_divisor(percentage_max_limits):
+        if percentage_max_limits > 100:
+            percentage_max_limits = 100
+        factor_list = []
+        i = 1
+        while i <= math.sqrt(percentage_max_limits):
+            if percentage_max_limits % i == 0:
+                factor_list.append(i)
+            i = i + 1
+        return factor_list[math.ceil(len(factor_list)/2)]
+
+    def balance_scopes_collections_items(self, bucket_spec):
         new_collection_per_scope_number = None
         new_scope_number = None
-        if bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] > 100 or \
-                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] > 100:
-            new_collection_per_scope_number = \
-                min(bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE], 80)
-            new_scope_number = \
-                min(bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET], 80)
+        if (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
+                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > 100:
+            new_collection_per_scope_number = self.get_divisor(80)
+            new_scope_number = 80 / new_collection_per_scope_number
 
-            bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = ((
+            bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = math.ceil((
                     bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] *
                     bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
                     bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) /
@@ -147,11 +158,11 @@ class CollectionBase(ClusterSetup):
 
             bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] = \
                 new_collection_per_scope_number
-            bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = new_scope_number
-            print("print")
+            bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = \
+                new_scope_number
+
             print(new_scope_number)
             print(new_collection_per_scope_number)
-
 
     def spec_for_serverless(self, bucket_spec):
         print("inside method")
@@ -168,14 +179,12 @@ class CollectionBase(ClusterSetup):
             for bucket in bucket_spec["buckets"]:
                 print("\n")
                 print(bucket_spec["buckets"][bucket])
-                self.balance_scopes_collections(bucket_spec["buckets"][bucket])
+                self.balance_scopes_collections_items(bucket_spec["buckets"][
+                                                     bucket])
                 print("after")
                 print(bucket_spec["buckets"][bucket])
                 print("\n")
                 print(bucket_spec)
-
-
-
 
     def collection_setup(self):
         print("inside reel method!!!!")
