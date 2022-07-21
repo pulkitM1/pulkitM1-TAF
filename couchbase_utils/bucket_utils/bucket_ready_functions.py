@@ -1969,6 +1969,8 @@ class BucketUtils(ScopeUtils):
 
     def create_bucket_from_dict_spec(self, cluster, bucket_name,
                                      bucket_spec, async_create=True):
+        print("creating for ")
+        print(bucket_name)
         task = BucketCreateFromSpecTask(
             self.task_manager, self.cluster_util.get_kv_nodes(cluster),
             bucket_name, bucket_spec)
@@ -1980,12 +1982,15 @@ class BucketUtils(ScopeUtils):
     def create_buckets_using_json_data(self, cluster, buckets_spec,
                                        async_create=True):
         self.log.info("Creating required buckets from template")
+        print(buckets_spec)
         load_data_from_existing_tar = False
         rest_conn = RestConnection(cluster.master)
         buckets_spec = BucketUtils.expand_buckets_spec(rest_conn,
                                                        buckets_spec)
         bucket_creation_tasks = list()
         for bucket_name, bucket_spec in buckets_spec.items():
+            print(":buckert namwe!")
+            print(bucket_name)
             if bucket_spec[MetaConstants.BUCKET_TAR_SRC]:
                 load_data_from_existing_tar = True
             bucket_creation_tasks.append(
