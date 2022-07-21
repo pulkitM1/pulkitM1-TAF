@@ -48,9 +48,12 @@ class CollectionBase(ClusterSetup):
         self.change_magma_quota = self.input.param("change_magma_quota", False)
         self.crud_batch_size = 100
         self.num_nodes_affected = 1
+        self.percentage_max_limits =\
+            self.input.param("percentage_max_limits", 80)
+        if self.percentage_max_limits > 100:
+            self.percentage_max_limits = 100
         if self.num_replicas > 1:
             self.num_nodes_affected = 2
-
         if self.doc_ops:
             self.doc_ops = self.doc_ops.split(';')
 
@@ -132,14 +135,13 @@ class CollectionBase(ClusterSetup):
 
     @staticmethod
     def get_divisor(percentage_max_limits):
-        if percentage_max_limits > 100:
-            percentage_max_limits = 100
         factor_list = []
         i = 1
         while i <= math.sqrt(percentage_max_limits):
             if percentage_max_limits % i == 0:
                 factor_list.append(i)
             i = i + 1
+        print(factor_list)
         index = (len(factor_list)//2)
         return factor_list[index]
 
@@ -147,9 +149,12 @@ class CollectionBase(ClusterSetup):
         new_collection_per_scope_number = None
         new_scope_number = None
         if (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
-                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > 100:
-            new_collection_per_scope_number = self.get_divisor(80)
-            new_scope_number = 80 / new_collection_per_scope_number
+                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > \
+                self.percentage_max_limits:
+            new_collection_per_scope_number = \
+                self.get_divisor(self.percentage_max_limits)
+            new_scope_number = (self.percentage_max_limits
+                                / new_collection_per_scope_number)
             print("yoy#")
             print(new_collection_per_scope_number)
 

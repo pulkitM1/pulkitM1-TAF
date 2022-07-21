@@ -5,9 +5,9 @@ spec = {
     MetaConstants.NUM_BUCKETS: 3,
     MetaConstants.REMOVE_DEFAULT_COLLECTION: False,
     MetaConstants.CREATE_COLLECTIONS_USING_MANIFEST_IMPORT: True,
-    MetaConstants.NUM_SCOPES_PER_BUCKET: 120,
-    MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 1,
-    MetaConstants.NUM_ITEMS_PER_COLLECTION: 1,
+    MetaConstants.NUM_SCOPES_PER_BUCKET: 30,
+    MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 40,
+    MetaConstants.NUM_ITEMS_PER_COLLECTION: 10,
 
     Bucket.bucketType: Bucket.Type.MEMBASE,
     Bucket.replicaNumber: Bucket.ReplicaNum.TWO,
@@ -23,14 +23,14 @@ spec = {
     "buckets": {
         "bucket1": {
             MetaConstants.NUM_SCOPES_PER_BUCKET: 5,
-            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 5,
+            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 20,
             MetaConstants.NUM_ITEMS_PER_COLLECTION: 10,
             Bucket.ramQuotaMB: 356
         },
         "bucket2": {
-            MetaConstants.NUM_SCOPES_PER_BUCKET: 5,
-            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 5,
-            MetaConstants.NUM_ITEMS_PER_COLLECTION: 500,
+            MetaConstants.NUM_SCOPES_PER_BUCKET: 30,
+            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 3,
+            MetaConstants.NUM_ITEMS_PER_COLLECTION: 30,
             Bucket.ramQuotaMB: 256,
             Bucket.storageBackend: Bucket.StorageBackend.magma
         }
