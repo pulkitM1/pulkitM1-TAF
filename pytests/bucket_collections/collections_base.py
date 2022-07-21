@@ -154,6 +154,8 @@ class CollectionBase(ClusterSetup):
             print(new_scope_number)
             print(new_collection_per_scope_number)
             print(bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION])
+            for bucket in bucket_spec["buckets"]:
+                print(bucket)
 
 
 
