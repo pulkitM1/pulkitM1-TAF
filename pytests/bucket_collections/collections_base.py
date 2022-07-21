@@ -159,7 +159,7 @@ class CollectionBase(ClusterSetup):
         new_scope_number = None
         print("\n")
         print(bucket_spec)
-        #self.balance_scopes_collections(bucket_spec)
+        self.balance_scopes_collections(bucket_spec)
         print("after")
         print(bucket_spec)
 
