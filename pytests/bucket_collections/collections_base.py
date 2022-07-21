@@ -155,9 +155,9 @@ class CollectionBase(ClusterSetup):
 
     def spec_for_serverless(self, bucket_spec):
         print("inside method")
-        print(bucket_spec)
         new_collection_per_scope_number = None
         new_scope_number = None
+        print("\n")
         print(bucket_spec)
         self.balance_scopes_collections(bucket_spec)
         print("after")
