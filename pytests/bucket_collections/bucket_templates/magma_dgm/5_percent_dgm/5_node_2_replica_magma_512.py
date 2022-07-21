@@ -20,4 +20,19 @@ spec = {
     Bucket.storageBackend: Bucket.StorageBackend.couchstore,
     Bucket.evictionPolicy: Bucket.EvictionPolicy.FULL_EVICTION,
     Bucket.compressionMode: Bucket.CompressionMode.ACTIVE,
+    "buckets": {
+        "bucket1": {
+            MetaConstants.NUM_SCOPES_PER_BUCKET: 60,
+            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 10,
+            MetaConstants.NUM_ITEMS_PER_COLLECTION: 10,
+            Bucket.ramQuotaMB: 356
+        },
+        "bucket2": {
+            MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
+            MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 10,
+            MetaConstants.NUM_ITEMS_PER_COLLECTION: 500,
+            Bucket.ramQuotaMB: 256,
+            Bucket.storageBackend: Bucket.StorageBackend.magma
+        }
+    }
 }
