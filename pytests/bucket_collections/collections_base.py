@@ -50,8 +50,9 @@ class CollectionBase(ClusterSetup):
         self.num_nodes_affected = 1
         self.percentage_max_limits =\
             self.input.param("percentage_max_limits", 80)
-        if self.percentage_max_limits > 100:
-            self.percentage_max_limits = 100
+        if self.percentage_max_limits >= 100 or\
+                self.percentage_max_limits <= 0:
+            self.percentage_max_limits = 80
         if self.num_replicas > 1:
             self.num_nodes_affected = 2
         if self.doc_ops:
@@ -158,11 +159,12 @@ class CollectionBase(ClusterSetup):
             print("yoy#")
             print(new_collection_per_scope_number)
 
-            bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = math.ceil((
+            bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = \
+                int(math.ceil((
                     bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] *
                     bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
                     bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) /
-                   (new_collection_per_scope_number * new_scope_number))
+                   (new_collection_per_scope_number * new_scope_number)))
 
             bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] = \
                 new_collection_per_scope_number
@@ -226,7 +228,10 @@ class CollectionBase(ClusterSetup):
         # Process params to over_ride values if required
         self.over_ride_bucket_template_params(buckets_spec)
         self.over_ride_doc_loading_template_params(doc_loading_spec)
-        self.spec_for_serverless(buckets_spec)
+        print("server!")
+        print(CbServer.cluster_profile)
+        if CbServer.cluster_profile == "serverless":
+            self.spec_for_serverless(buckets_spec)
         print("out")
         self.set_retry_exceptions_for_initial_data_load(doc_loading_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
