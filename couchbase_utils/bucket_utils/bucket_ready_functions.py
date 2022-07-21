@@ -2005,41 +2005,43 @@ class BucketUtils(ScopeUtils):
                                % task.thread_name)
             else:
                 cluster.buckets.append(task.bucket_obj)
-
-        for bucket in cluster.buckets:
-            if not buckets_spec.get(bucket.name):
-                continue
-            for scope_name, scope_spec \
-                    in buckets_spec[bucket.name]["scopes"].items():
-                if type(scope_spec) is not dict:
-                    continue
-
-                if scope_name != CbServer.default_scope:
-                    self.create_scope_object(bucket, scope_spec)
-
-                for c_name, c_spec in scope_spec["collections"].items():
-                    if type(c_spec) is not dict:
-                        continue
-                    c_spec["name"] = c_name
-                    self.create_collection_object(bucket,
-                                                  scope_name,
-                                                  c_spec)
-
-        if load_data_from_existing_tar:
-            for bucket_name, bucket_spec in buckets_spec.items():
-                bucket_obj = self.get_bucket_obj(cluster.buckets, bucket_name)
-                self.load_bucket_from_tar(
-                    cluster.nodes_in_cluster, bucket_obj,
-                    bucket_spec[MetaConstants.BUCKET_TAR_SRC],
-                    bucket_spec[MetaConstants.BUCKET_TAR_DIR])
-
-                # Update new num_items for each collection post data loading
-                collection_item_count = \
-                    self.get_doc_count_per_collection(cluster, bucket_obj)
-                for s_name, scope in bucket_obj.scopes.items():
-                    for c_name, collection in scope.collections.items():
-                        collection.num_items = \
-                            collection_item_count[s_name][c_name]["items"]
+        print("bucket created!")
+        # for bucket in cluster.buckets:
+        #     print("bucket data fill")
+        #     print(buckets_spec.get(bucket.name))
+        #     if not buckets_spec.get(bucket.name):
+        #         continue
+        #     for scope_name, scope_spec \
+        #             in buckets_spec[bucket.name]["scopes"].items():
+        #         if type(scope_spec) is not dict:
+        #             continue
+        #
+        #         if scope_name != CbServer.default_scope:
+        #             self.create_scope_object(bucket, scope_spec)
+        #
+        #         for c_name, c_spec in scope_spec["collections"].items():
+        #             if type(c_spec) is not dict:
+        #                 continue
+        #             c_spec["name"] = c_name
+        #             self.create_collection_object(bucket,
+        #                                           scope_name,
+        #                                           c_spec)
+        #
+        # if load_data_from_existing_tar:
+        #     for bucket_name, bucket_spec in buckets_spec.items():
+        #         bucket_obj = self.get_bucket_obj(cluster.buckets, bucket_name)
+        #         self.load_bucket_from_tar(
+        #             cluster.nodes_in_cluster, bucket_obj,
+        #             bucket_spec[MetaConstants.BUCKET_TAR_SRC],
+        #             bucket_spec[MetaConstants.BUCKET_TAR_DIR])
+        #
+        #         # Update new num_items for each collection post data loading
+        #         collection_item_count = \
+        #             self.get_doc_count_per_collection(cluster, bucket_obj)
+        #         for s_name, scope in bucket_obj.scopes.items():
+        #             for c_name, collection in scope.collections.items():
+        #                 collection.num_items = \
+        #                     collection_item_count[s_name][c_name]["items"]
 
     def load_bucket_from_tar(self, kv_nodes, bucket_obj, tar_src, tar_dir):
         """
