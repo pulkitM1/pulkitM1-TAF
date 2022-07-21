@@ -143,8 +143,8 @@ class CollectionBase(ClusterSetup):
                 factor_list.append(i)
             i = i + 1
         print(factor_list)
-        index = (len(factor_list)//2)
-        return factor_list[index]
+        return_index = (len(factor_list)//2)
+        return factor_list[return_index]
 
     def balance_scopes_collections_items(self, bucket_spec):
         new_collection_per_scope_number = None
@@ -152,6 +152,10 @@ class CollectionBase(ClusterSetup):
         if (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
                 bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > \
                 self.percentage_max_limits:
+            self.log.info("Readjusting scopes, collections, items in bucket "
+                          "to adhere to serverless constraints")
+
+            # scope and collections limits according to percentage_max_limits
             new_collection_per_scope_number = \
                 self.get_divisor(self.percentage_max_limits)
             new_scope_number = (self.percentage_max_limits
@@ -159,6 +163,7 @@ class CollectionBase(ClusterSetup):
             print("yoy#")
             print(new_collection_per_scope_number)
 
+            # setting new number_items for bucket
             bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = \
                 int(math.ceil((
                     bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] *
@@ -174,7 +179,7 @@ class CollectionBase(ClusterSetup):
             print(new_scope_number)
             print(new_collection_per_scope_number)
 
-    def spec_for_serverless(self, bucket_spec):
+    def specs_for_serverless(self, bucket_spec):
         print("inside method")
         new_collection_per_scope_number = None
         new_scope_number = None
@@ -231,7 +236,7 @@ class CollectionBase(ClusterSetup):
         print("server!")
         print(CbServer.cluster_profile)
         if CbServer.cluster_profile == "serverless":
-            self.spec_for_serverless(buckets_spec)
+            self.specs_for_serverless(buckets_spec)
         print("out")
         self.set_retry_exceptions_for_initial_data_load(doc_loading_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
