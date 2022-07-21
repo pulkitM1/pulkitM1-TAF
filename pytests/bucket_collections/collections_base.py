@@ -167,10 +167,10 @@ class CollectionBase(ClusterSetup):
         if "buckets" in bucket_spec:
             for bucket in bucket_spec["buckets"]:
                 print("\n")
-                print(bucket)
-                self.balance_scopes_collections(bucket)
+                print(bucket_spec["buckets"][bucket])
+                self.balance_scopes_collections(bucket_spec["buckets"][bucket])
                 print("after")
-                print(bucket)
+                print(bucket_spec["buckets"][bucket])
                 print("\n")
                 print(bucket_spec)
 
