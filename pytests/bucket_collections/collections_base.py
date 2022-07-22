@@ -182,21 +182,22 @@ class CollectionBase(ClusterSetup):
         new_scope_number = None
         print("\n")
         print(bucket_spec)
-        self.balance_scopes_collections_items(bucket_spec, "default")
+        self.balance_scopes_collections_items(bucket_spec, "the default "
+                                                           "values in spec")
         print("after!!@@")
         print(bucket_spec)
 
         print(bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION])
-        if "buckets" in bucket_spec:
-            for bucket in bucket_spec["buckets"]:
-                print("\n")
-                print(bucket_spec["buckets"][bucket])
-                self.balance_scopes_collections_items(bucket_spec["buckets"][
+       # if "buckets" in bucket_spec:
+        for bucket in bucket_spec["buckets"]:
+            print("\n")
+            print(bucket_spec["buckets"][bucket])
+            self.balance_scopes_collections_items(bucket_spec["buckets"][
                                                      bucket], bucket)
-                print("after")
-                print(bucket_spec["buckets"][bucket])
-                print("\n")
-                print(bucket_spec)
+            print("after")
+            print(bucket_spec["buckets"][bucket])
+            print("\n")
+            print(bucket_spec)
 
     def collection_setup(self):
         print("inside reel method!!!!")
