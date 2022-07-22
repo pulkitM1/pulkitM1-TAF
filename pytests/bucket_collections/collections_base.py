@@ -48,11 +48,6 @@ class CollectionBase(ClusterSetup):
         self.change_magma_quota = self.input.param("change_magma_quota", False)
         self.crud_batch_size = 100
         self.num_nodes_affected = 1
-        self.percentage_max_limits =\
-            self.input.param("percentage_max_limits", 80)
-        if self.percentage_max_limits >= 100 or\
-                self.percentage_max_limits <= 0:
-            self.percentage_max_limits = 80
         if self.num_replicas > 1:
             self.num_nodes_affected = 2
         if self.doc_ops:
@@ -134,32 +129,33 @@ class CollectionBase(ClusterSetup):
                 req_clients=req_clients,
                 compression_settings=sdk_compression)
 
-    @staticmethod
-    def get_divisor(percentage_max_limits):
-        factor_list = []
-        i = 1
-        while i <= math.sqrt(percentage_max_limits):
-            if percentage_max_limits % i == 0:
-                factor_list.append(i)
-            i = i + 1
-        print(factor_list)
-        return_index = (len(factor_list)//2)
-        return factor_list[return_index]
-
     def balance_scopes_collections_items(self, bucket_spec, bucket_name):
+        def get_divisor(max_limits_variable):
+            factor_list = []
+            i = 1
+            while i <= math.sqrt(max_limits_variable):
+                if max_limits_variable % i == 0:
+                    factor_list.append(i)
+                i = i + 1
+            return_index = (len(factor_list) // 2)
+            return factor_list[return_index]
+
+        max_limits = self.input.param("max_limits", 80)
+        if max_limits >= 100 or max_limits <= 0:
+            max_limits = 80
+
         new_collection_per_scope_number = None
         new_scope_number = None
         if (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
                 bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > \
-                self.percentage_max_limits:
+                max_limits:
             self.log.info("Readjusting scopes, collections, items in bucket "
                           "to adhere to serverless constraints for"
                           " {0}".format(bucket_name))
 
-            # scope and collections limits according to percentage_max_limits
-            new_collection_per_scope_number = \
-                self.get_divisor(self.percentage_max_limits)
-            new_scope_number = (self.percentage_max_limits
+            # scope and collections limits according to max_limits
+            new_collection_per_scope_number = get_divisor(max_limits)
+            new_scope_number = (max_limits
                                 / new_collection_per_scope_number)
             print("yoy#")
             print(new_collection_per_scope_number)
