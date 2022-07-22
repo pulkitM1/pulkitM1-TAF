@@ -3,7 +3,7 @@ import time
 
 from BucketLib.bucket import Bucket
 from BucketLib.BucketOperations import BucketHelper
-from Cb_constants import DocLoading
+from Cb_constants import DocLoading,CbServer
 from Jython_tasks.task import AutoFailoverNodesFailureTask, NodeDownTimerTask
 from basetestcase import ClusterSetup
 from cb_tools.cbstats import Cbstats
@@ -117,7 +117,8 @@ class AutoFailoverBaseTest(ClusterSetup):
             self.input.param("override_spec_params", "").split(";")
 
         # Create bucket(s)
-        if self.bucket_storage == Bucket.StorageBackend.magma:
+        if CbServer.cluster_profile == "default" and self.bucket_storage == \
+                Bucket.StorageBackend.magma:
             # get the TTL value
             buckets_spec_from_conf = \
                 self.bucket_util.get_bucket_template_from_package(
@@ -141,6 +142,8 @@ class AutoFailoverBaseTest(ClusterSetup):
         # Process params to over_ride values if required
         self.over_ride_bucket_template_params(buckets_spec)
         self.over_ride_doc_loading_template_params(doc_loading_spec)
+        if CbServer.cluster_profile == "serverless":
+            self.bucket_util.specs_for_serverless(buckets_spec)
         self.set_retry_exceptions_for_initial_data_load(doc_loading_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
                                                         buckets_spec)
@@ -1018,7 +1021,8 @@ class DiskAutoFailoverBasetest(AutoFailoverBaseTest):
         # If True, creates bucket/scope/collections with simpler names
         self.use_simple_names = self.input.param("use_simple_names", True)
         # Create bucket(s)
-        if self.bucket_storage == Bucket.StorageBackend.magma:
+        if CbServer.cluster_profile == "default" and self.bucket_storage == \
+                Bucket.StorageBackend.magma:
             # get the TTL value
             buckets_spec_from_conf = \
                 self.bucket_util.get_bucket_template_from_package(
@@ -1038,6 +1042,8 @@ class DiskAutoFailoverBasetest(AutoFailoverBaseTest):
         buckets_spec[MetaConstants.USE_SIMPLE_NAMES] = self.use_simple_names
         doc_loading_spec = \
             self.bucket_util.get_crud_template_from_package("initial_load")
+        if CbServer.cluster_profile == "serverless":
+            self.bucket_util.specs_for_serverless(buckets_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
                                                         buckets_spec)
         self.bucket_util.wait_for_collection_creation_to_complete(self.cluster)

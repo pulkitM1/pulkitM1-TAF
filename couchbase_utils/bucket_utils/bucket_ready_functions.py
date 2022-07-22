@@ -16,6 +16,7 @@ import requests
 import concurrent.futures
 
 import exceptions
+import math
 import json
 import random
 import string
@@ -1978,6 +1979,56 @@ class BucketUtils(ScopeUtils):
         if not async_create:
             self.task_manager.get_task_result(task)
         return task
+
+    def specs_for_serverless(self, bucket_spec):
+        self.balance_scopes_collections_items(bucket_spec, "the default "
+                                                           "values in spec")
+        if "buckets" in bucket_spec:
+            for bucket in bucket_spec["buckets"]:
+                self.balance_scopes_collections_items(bucket_spec["buckets"][
+                                                     bucket], bucket)
+
+    def balance_scopes_collections_items(self, bucket_spec, bucket_name):
+        def get_divisor(max_limits_variable):
+            factor_list = []
+            i = 1
+            while i <= math.sqrt(max_limits_variable):
+                if max_limits_variable % i == 0:
+                    factor_list.append(i)
+                i = i + 1
+            return_index = (len(factor_list) // 2)
+            return factor_list[return_index]
+
+        max_limits = self.input.param("max_limits", 80)
+        if max_limits >= 100 or max_limits <= 0:
+            max_limits = 80
+
+        new_collection_per_scope_number = None
+        new_scope_number = None
+        if (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
+                bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > \
+                max_limits:
+            self.log.info("Readjusting scopes, collections, items in bucket "
+                          "to adhere to serverless constraints for"
+                          " {0}".format(bucket_name))
+
+            # scope and collections limits according to max_limits
+            new_collection_per_scope_number = get_divisor(max_limits)
+            new_scope_number = (max_limits
+                                / new_collection_per_scope_number)
+
+            # setting new number_items for bucket
+            bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = \
+                int(math.ceil((
+                    bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] *
+                    bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
+                    bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) /
+                   (new_collection_per_scope_number * new_scope_number)))
+
+            bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE] = \
+                new_collection_per_scope_number
+            bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = \
+                new_scope_number
 
     def create_buckets_using_json_data(self, cluster, buckets_spec,
                                        async_create=True):
