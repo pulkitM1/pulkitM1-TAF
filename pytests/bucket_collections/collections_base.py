@@ -17,9 +17,7 @@ from java.lang import Exception as Java_base_exception
 
 class CollectionBase(ClusterSetup):
     def setUp(self):
-        print("before setup")
         super(CollectionBase, self).setUp()
-        print("After setup")
         self.log_setup_status("CollectionBase", "started")
 
         self.key = 'test_collection'.rjust(self.key_size, '0')
@@ -68,7 +66,6 @@ class CollectionBase(ClusterSetup):
                                                    num_reader_threads="disk_io_optimized")
 
         try:
-            print("on setup")
             self.collection_setup()
         except Java_base_exception as exception:
             self.handle_setup_exception(exception)
@@ -157,8 +154,6 @@ class CollectionBase(ClusterSetup):
             new_collection_per_scope_number = get_divisor(max_limits)
             new_scope_number = (max_limits
                                 / new_collection_per_scope_number)
-            print("yoy#")
-            print(new_collection_per_scope_number)
 
             # setting new number_items for bucket
             bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION] = \
@@ -173,39 +168,19 @@ class CollectionBase(ClusterSetup):
             bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = \
                 new_scope_number
 
-            print(new_scope_number)
-            print(new_collection_per_scope_number)
-
     def specs_for_serverless(self, bucket_spec):
-        print("inside method")
-        new_collection_per_scope_number = None
-        new_scope_number = None
-        print("\n")
-        print(bucket_spec)
         self.balance_scopes_collections_items(bucket_spec, "the default "
                                                            "values in spec")
-        print("after!!@@")
-        print(bucket_spec)
-
-        print(bucket_spec[MetaConstants.NUM_ITEMS_PER_COLLECTION])
         if "buckets" in bucket_spec:
             for bucket in bucket_spec["buckets"]:
-                print("\n")
-                print(bucket_spec["buckets"][bucket])
                 self.balance_scopes_collections_items(bucket_spec["buckets"][
                                                      bucket], bucket)
-                print("after")
-                print(bucket_spec["buckets"][bucket])
-                print("\n")
-                print(bucket_spec)
 
     def collection_setup(self):
-        print("inside reel method!!!!")
         self.bucket_util.add_rbac_user(self.cluster.master)
 
         # Create bucket(s) and add rbac user
         if self.bucket_storage == Bucket.StorageBackend.magma:
-            print("inside if")
             # get the TTL value
             buckets_spec_from_conf = \
                 self.bucket_util.get_bucket_template_from_package(
@@ -231,19 +206,15 @@ class CollectionBase(ClusterSetup):
         # Process params to over_ride values if required
         self.over_ride_bucket_template_params(buckets_spec)
         self.over_ride_doc_loading_template_params(doc_loading_spec)
-        print("server!")
-        print(CbServer.cluster_profile)
         if CbServer.cluster_profile == "serverless":
             self.specs_for_serverless(buckets_spec)
 
 
-        print("out")
         self.set_retry_exceptions_for_initial_data_load(doc_loading_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
                                                         buckets_spec)
-        print("out2")
+
         self.bucket_util.wait_for_collection_creation_to_complete(self.cluster)
-        print("out3")
         # Prints bucket stats before doc_ops
         self.bucket_util.print_bucket_stats(self.cluster)
 
