@@ -2002,9 +2002,8 @@ class BucketUtils(ScopeUtils):
             return factor_list[return_index]
 
         def bucket_spec_check(spec_name):
-            bucket_spec[spec_name] = \
-                bucket_spec[spec_name] if bucket_spec[spec_name] \
-                else default_scope[spec_name]
+            if not bucket_spec[spec_name]:
+                bucket_spec[spec_name] = default_scope[spec_name]
 
         if default_scope:
             bucket_spec_check("MetaConstants.NUM_SCOPES_PER_BUCKET")
