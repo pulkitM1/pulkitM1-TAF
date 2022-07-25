@@ -1987,9 +1987,10 @@ class BucketUtils(ScopeUtils):
         if "buckets" in bucket_spec:
             for bucket in bucket_spec["buckets"]:
                 self.balance_scopes_collections_items(
-                    bucket_spec["buckets"][bucket])
+                    bucket_spec["buckets"][bucket], bucket_spec)
 
-    def balance_scopes_collections_items(self, bucket_spec):
+    def balance_scopes_collections_items(self, bucket_spec,
+                                         default_scope=None):
         def get_divisor(max_limits_variable):
             factor_list = []
             i = 1
@@ -2000,7 +2001,16 @@ class BucketUtils(ScopeUtils):
             return_index = (len(factor_list) // 2)
             return factor_list[return_index]
 
-        bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = 10
+        def bucket_spec_check(spec_name):
+            bucket_spec[spec_name] = \
+                bucket_spec[spec_name] if bucket_spec[spec_name] \
+                else default_scope[spec_name]
+
+        if default_scope:
+            bucket_spec_check("MetaConstants.NUM_SCOPES_PER_BUCKET")
+            bucket_spec_check("MetaConstants.NUM_ITEMS_PER_COLLECTION")
+            bucket_spec_check("MetaConstants.NUM_COLLECTIONS_PER_SCOPE")
+
         print("speccc")
         print(bucket_spec)
         max_limits = self.input.param("max_limits", 80)
