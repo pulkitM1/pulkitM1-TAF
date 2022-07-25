@@ -33,7 +33,7 @@ spec = {
             MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
             MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 10,
             MetaConstants.NUM_ITEMS_PER_COLLECTION: 1000,
-            Bucket.ramQuotaMB: 2000
+            Bucket.ramQuotaMB: 1000
         },
         "bucket2": {
             MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
