@@ -2002,7 +2002,7 @@ class BucketUtils(ScopeUtils):
             return factor_list[return_index]
 
         def bucket_spec_check(spec_name):
-            if not bucket_spec[spec_name]:
+            if spec_name not in bucket_spec:
                 bucket_spec[spec_name] = default_scope[spec_name]
 
         if default_scope:
