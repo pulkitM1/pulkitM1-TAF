@@ -1784,7 +1784,9 @@ class BucketUtils(ScopeUtils):
             bucket_obj.servers = list()
             try:
                 b_stat = helper.get_bucket_json(bucket_obj.name)
-                self.log.debug("%s" % b_stat)
+                self.log.debug("%s - Server list::%s"
+                               % (bucket_obj.name,
+                                  b_stat["vBucketServerMap"]["serverList"]))
                 for server in b_stat["vBucketServerMap"]["serverList"]:
                     ip, mc_port = server.split(":")
                     for node in cluster.nodes_in_cluster:
@@ -4101,26 +4103,43 @@ class BucketUtils(ScopeUtils):
                 break
         else:
             bucket = Bucket()
-            bucket.name = parsed[Bucket.name]
 
-        bucket.uuid = parsed[Bucket.uuid]
-        if Bucket.num_vbuckets in parsed:
-            bucket.num_vbuckets = parsed[Bucket.num_vbuckets]
-        bucket.bucketType = parsed[Bucket.bucketType]
+            # Following params can be initialized only once,
+            # so avoiding overwriting of already known values to enhance
+            # validation procedures. And these values has to be updated
+            # only by the update_bucket_props() to track the current value
+            bucket.name = parsed[Bucket.name]
+            if Bucket.num_vbuckets in parsed:
+                bucket.num_vbuckets = parsed[Bucket.num_vbuckets]
+
+            bucket.bucketType = parsed[Bucket.bucketType]
+            if Bucket.maxTTL in parsed:
+                bucket.maxTTL = parsed[Bucket.maxTTL]
+
+            if Bucket.width in parsed:
+                bucket.serverless = Serverless()
+                bucket.serverless.width = parsed[Bucket.width]
+                bucket.serverless.weight = parsed[Bucket.weight]
+
+            if Bucket.durabilityMinLevel in parsed:
+                bucket.durability_level = parsed[Bucket.durabilityMinLevel]
+
+            if Bucket.compressionMode in parsed:
+                bucket.compressionMode = parsed[Bucket.compressionMode]
+
+            if Bucket.conflictResolutionType in parsed:
+                bucket.conflictResolutionType = \
+                    parsed[Bucket.conflictResolutionType]
+
+        # Sanitise the value to the expected value for cb buckets
         if bucket.bucketType == 'membase':
             bucket.bucketType = Bucket.Type.MEMBASE
-        if Bucket.maxTTL in parsed:
-            bucket.maxTTL = parsed[Bucket.maxTTL]
 
-        if Bucket.width in parsed:
-            if bucket.serverless is None:
-                bucket.serverless = Serverless()
-            bucket.serverless.width = parsed[Bucket.width]
-            bucket.serverless.weight = parsed[Bucket.weight]
-
+        # Set only if not set previously
+        # (Can happen since we directly adding the bucket_obj to the cluster)
+        bucket.uuid = bucket.uuid or parsed[Bucket.uuid]
         bucket.bucketCapabilities = parsed["bucketCapabilities"]
-        if Bucket.durabilityMinLevel in parsed:
-            bucket.durability_level = parsed[Bucket.durabilityMinLevel]
+
         if 'vBucketServerMap' in parsed:
             vBucketServerMap = parsed['vBucketServerMap']
             serverList = vBucketServerMap['serverList']
@@ -4163,8 +4182,7 @@ class BucketUtils(ScopeUtils):
         if bucket.bucketType != "memcached":
             bucket.stats.diskUsed = stats['diskUsed']
         bucket.stats.memUsed = stats['memUsed']
-        quota = parsed['quota']
-        bucket.stats.ram = quota['ram']
+        bucket.stats.ram = parsed['quota']['ram']
         return bucket
 
     def wait_till_total_numbers_match(self, master, bucket,
@@ -4901,14 +4919,30 @@ class BucketUtils(ScopeUtils):
                 if s_bucket["name"] == target_bucket.name:
                     return s_bucket
 
+        def get_server_node(server_ip):
+            for t_node in server_nodes:
+                if t_node.ip == server_ip:
+                    return t_node
+
         result = True
+        rest = RestConnection(cluster.master)
         helper = BucketHelper(cluster.master)
+        # Stats wrt Cluster nodes
         server_buckets = helper.get_buckets_json()
+        server_nodes = rest.get_nodes()
+        # Stats wrt the test
+        test_values = dict()
+
+        kv_limit_stat_fields = ["buckets", "weight", "memory"]
+        nodes_utilization_values = dict()
+        for field in kv_limit_stat_fields:
+            nodes_utilization_values[field] = 0
 
         for t_bucket in buckets:
-            self.log.info("Validating bucket %s" % t_bucket.name)
+            self.log.info("Validating serverless bucket %s" % t_bucket.name)
             # Validate bucket.width is matching as expected
             width = t_bucket.serverless.width
+            weight = t_bucket.serverless.weight
             server_bucket = get_server_bucket(t_bucket)
             req_len = width * CbServer.Serverless.KV_SubCluster_Size
             server_len = len(server_bucket["nodes"])
@@ -4939,14 +4973,92 @@ class BucketUtils(ScopeUtils):
                 if node["serverGroup"] not in az_map:
                     az_map[node["serverGroup"]] = 0
                 az_map[node["serverGroup"]] += 1
-            tem_weight = list(set(az_map.values()))
-            if len(tem_weight) != 1:
+            tem_width = list(set(az_map.values()))
+            self.log.debug("%s - Expected width=%s, actual=%s"
+                           % (t_bucket.name, width, tem_width[0]))
+            if len(tem_width) != 1:
                 result = False
                 self.log.critical("Uneven bucket distribution: %s" % az_map)
-            elif tem_weight[0] != width:
+            elif tem_width[0] != width:
                 result = False
                 self.log.critical("Expected bucket width %s, actual %s"
-                                  % (width, tem_weight[0]))
+                                  % (width, tem_width[0]))
+
+            # Calculate servers' utilization values as per the test
+            for b_server in t_bucket.servers:
+                if b_server.ip not in test_values:
+                    # Init values for new server
+                    test_values[b_server.ip] = dict()
+                    for field in kv_limit_stat_fields:
+                        test_values[b_server.ip][field] = 0
+
+                test_values[b_server.ip]["buckets"] += 1
+                test_values[b_server.ip]["weight"] += weight
+                test_values[b_server.ip]["memory"] += \
+                    t_bucket.ramQuotaMB * 1048576
+
+            # Begin limit/utilization validation
+            for node_ip, test_stats in test_values.items():
+                server_node = get_server_node(node_ip)
+                server_kv_limits = server_node.limits[CbServer.Services.KV]
+                server_kv_usage = server_node.utilization[CbServer.Services.KV]
+                # MAX_WEIGHT check
+                self.log.debug("%s - max_weight=%s"
+                               % (node_ip, server_kv_limits["weight"]))
+                if server_kv_limits["weight"] \
+                        != CbServer.Serverless.MAX_WEIGHT:
+                    result = False
+                    self.log.critical(
+                        "%s - Expected limits::weight=%s, actual=%s"
+                        % (node_ip, CbServer.Serverless.MAX_WEIGHT,
+                           server_kv_limits["weight"]))
+                # MAX_BUCKETS check
+                self.log.debug("%s - max_buckets=%s"
+                               % (node_ip, server_kv_limits["buckets"]))
+                if server_kv_limits["buckets"] \
+                        != CbServer.Serverless.MAX_BUCKETS:
+                    result = False
+                    self.log.critical(
+                        "%s - Expected limits::buckets=%s, actual=%s"
+                        % (node_ip, CbServer.Serverless.MAX_BUCKETS,
+                           server_kv_limits["buckets"]))
+                # MEMORY usage check
+                self.log.debug("%s - Mem max=%s, Usage expected=%s, actual=%s"
+                               % (node_ip, server_kv_limits["memory"],
+                                  test_stats["memory"],
+                                  server_kv_usage["memory"]))
+                if server_kv_usage["memory"] > server_kv_limits["memory"]:
+                    result = False
+                    self.log.critical(
+                        "%s - memory usage more than expected=%s < actual=%s"
+                        % (node_ip, server_kv_limits["memory"],
+                           server_kv_usage["memory"]))
+                if server_kv_usage["memory"] != test_stats["memory"]:
+                    result = False
+                    self.log.critical(
+                        "%s - Memory usage mismatch. Expected=%s, actual=%s"
+                        % (node_ip, test_stats["memory"],
+                           server_kv_usage["memory"]))
+                # BUCKETS check
+                self.log.debug("%s - Num_Buckets expected=%s, actual=%s"
+                               % (node_ip, test_stats["buckets"],
+                                  server_kv_usage["buckets"]))
+                if server_kv_usage["buckets"] != test_stats["buckets"]:
+                    result = False
+                    self.log.critical(
+                        "%s - Mismatch in num_buckets. Expected=%s, actual=%s"
+                        % (node_ip, test_stats["buckets"],
+                           server_kv_usage["buckets"]))
+                # WEIGHT check
+                self.log.debug("%s - Node_weight expected=%s, actual=%s"
+                               % (node_ip, test_stats["weight"],
+                                  server_kv_usage["weight"]))
+                if server_kv_usage["weight"] != test_stats["weight"]:
+                    result = False
+                    self.log.critical(
+                        "%s - Mismatch in weight. Expected=%s, actual=%s"
+                        % (node_ip, test_stats["weight"],
+                           server_kv_usage["weight"]))
         return result
 
     def remove_scope_collections_for_bucket(self, cluster, bucket):

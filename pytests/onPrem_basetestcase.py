@@ -94,7 +94,7 @@ class OnPremBaseTest(CouchbaseBaseTest):
         self.ipv4_only = self.input.param("ipv4_only", False)
         self.ipv6_only = self.input.param("ipv6_only", False)
         self.multiple_ca = self.input.param("multiple_ca", False)
-        # This is user defined throttling limit used specifically in serverless config
+         # This is user defined throttling limit used specifically in serverless config
         self.kv_throttling_limit = self.input.param("kv_throttling_limit", 200000)
 
         self.node_utils.cleanup_pcaps(self.servers)
@@ -178,6 +178,24 @@ class OnPremBaseTest(CouchbaseBaseTest):
             self.cluster_util.is_enterprise_edition(self.cluster)
         self.cluster.edition = "enterprise" \
             if CbServer.enterprise_edition else "community"
+
+        # Fetch the profile_type from the master node
+        # Value will be default / serverless
+        CbServer.cluster_profile = self.cluster_util.get_server_profile_type(
+            self.cluster.master)
+
+        # Enable use_https and enforce_tls for 'serverless' cluster testing
+        # And set default bucket/cluster setting values to tests
+        if CbServer.cluster_profile == "serverless":
+            self.use_https = True
+            self.enforce_tls = True
+
+            CbServer.use_https = True
+            trust_all_certs()
+
+            self.bucket_storage = Bucket.StorageBackend.magma
+            self.num_replicas = Bucket.ReplicaNum.TWO
+            self.server_groups = "test_zone_1:test_zone_2:test_zone_3"
 
         if self.standard_buckets > 10:
             self.bucket_util.change_max_buckets(self.cluster.master,
@@ -267,7 +285,8 @@ class OnPremBaseTest(CouchbaseBaseTest):
                     self.task_manager.get_task_result(task)
 
             # Enforce tls on nodes of all clusters
-            if self.use_https and self.enforce_tls:
+            if (self.use_https and self.enforce_tls) \
+                    and not self.skip_cluster_reset:
                 for _, cluster in self.cb_clusters.items():
                     tasks = [self.node_utils.async_enable_tls(node)
                              for node in cluster.servers]
@@ -911,7 +930,8 @@ class ClusterSetup(OnPremBaseTest):
 
         if CbServer.cluster_profile == "serverless":
             # Workaround to hitting throttling on serverless config
-            _, status = RestConnection(self.cluster.master).set_throttle_limit(limit=self.kv_throttling_limit)
+            _, status = RestConnection(self.cluster.master).set_throttle_limit(
+                limit=self.kv_throttling_limit)
 
         # Used to track spare nodes.
         # Test case can use this for further rebalance
