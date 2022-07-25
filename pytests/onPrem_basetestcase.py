@@ -274,8 +274,8 @@ class OnPremBaseTest(CouchbaseBaseTest):
                 self.cluster_util.update_cluster_nodes_service_list(cluster)
 
                 # Set this unconditionally
-                # RestConnection(cluster.master).set_internalSetting(
-                #     "magmaMinMemoryQuota", 256)
+                RestConnection(cluster.master).set_internalSetting(
+                    "magmaMinMemoryQuota", 256)
 
             # Enable dp_version since we need collections enabled
             if self.enable_dp:
