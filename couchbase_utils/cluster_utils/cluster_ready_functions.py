@@ -1137,6 +1137,7 @@ class ClusterUtils:
         return picked
 
     def check_if_services_obey_tls(self, servers, port_map=CbServer.ssl_port_map):
+        print("inside check tls!")
         """
         Parameters:
         servers - list of servers on which to check
@@ -1153,9 +1154,14 @@ class ClusterUtils:
             shell = RemoteMachineShellConnection(server)
             # service should listen on non-ssl port only on localhost/no-address
             for port in port_map.keys():
+                print("port")
+                print(port)
                 addresses = shell.get_port_recvq(port)
+                print("Address")
+                print(addresses)
                 for address in addresses:
                     expected_address = "127.0.0.1:" + port + '\n'
+                    print(expected_address)
                     if address != expected_address:
                         self.log.error(" On Server {0} Expected {1} Actual {2}".
                                        format(server.ip, expected_address, address))

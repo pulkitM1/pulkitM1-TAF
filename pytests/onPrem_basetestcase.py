@@ -287,6 +287,7 @@ class OnPremBaseTest(CouchbaseBaseTest):
             # Enforce tls on nodes of all clusters
             if (self.use_https and self.enforce_tls) \
                     and not self.skip_cluster_reset:
+                print("inside ! tls")
                 for _, cluster in self.cb_clusters.items():
                     tasks = [self.node_utils.async_enable_tls(node)
                              for node in cluster.servers]
