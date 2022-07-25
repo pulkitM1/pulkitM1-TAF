@@ -2000,6 +2000,9 @@ class BucketUtils(ScopeUtils):
             return_index = (len(factor_list) // 2)
             return factor_list[return_index]
 
+        bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] = 10
+        print("speccc")
+        print(bucket_spec)
         max_limits = self.input.param("max_limits", 80)
         if max_limits >= 100 or max_limits <= 0:
             max_limits = 80
