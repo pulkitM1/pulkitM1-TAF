@@ -24,21 +24,20 @@ spec = {
         "default": {
             MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
             MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 25,
-            MetaConstants.NUM_ITEMS_PER_COLLECTION: 78300,
+            MetaConstants.NUM_ITEMS_PER_COLLECTION: 10,
             Bucket.ramQuotaMB: 512,
             Bucket.storageBackend: Bucket.StorageBackend.magma,
             Bucket.priority: Bucket.Priority.HIGH
         },
         "bucket1": {
-            MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
             MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 10,
-            MetaConstants.NUM_ITEMS_PER_COLLECTION: 1000,
+            MetaConstants.NUM_ITEMS_PER_COLLECTION: 10,
             Bucket.ramQuotaMB: 512
         },
         "bucket2": {
             MetaConstants.NUM_SCOPES_PER_BUCKET: 10,
             MetaConstants.NUM_COLLECTIONS_PER_SCOPE: 10,
-            MetaConstants.NUM_ITEMS_PER_COLLECTION: 500,
+            MetaConstants.NUM_ITEMS_PER_COLLECTION: 10,
             Bucket.ramQuotaMB: 512,
             Bucket.storageBackend: Bucket.StorageBackend.magma
         }

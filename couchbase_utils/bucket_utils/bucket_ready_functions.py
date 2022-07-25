@@ -1983,14 +1983,13 @@ class BucketUtils(ScopeUtils):
         return task
 
     def specs_for_serverless(self, bucket_spec):
-        self.balance_scopes_collections_items(bucket_spec, "the default "
-                                                           "values in spec")
+        self.balance_scopes_collections_items(bucket_spec)
         if "buckets" in bucket_spec:
             for bucket in bucket_spec["buckets"]:
-                self.balance_scopes_collections_items(bucket_spec["buckets"][
-                                                     bucket], bucket)
+                self.balance_scopes_collections_items(
+                    bucket_spec["buckets"][bucket])
 
-    def balance_scopes_collections_items(self, bucket_spec, bucket_name):
+    def balance_scopes_collections_items(self, bucket_spec):
         def get_divisor(max_limits_variable):
             factor_list = []
             i = 1
@@ -2010,9 +2009,6 @@ class BucketUtils(ScopeUtils):
         if (bucket_spec[MetaConstants.NUM_SCOPES_PER_BUCKET] *
                 bucket_spec[MetaConstants.NUM_COLLECTIONS_PER_SCOPE]) > \
                 max_limits:
-            self.log.info("Readjusting scopes, collections, items in bucket "
-                          "to adhere to serverless constraints for"
-                          " {0}".format(bucket_name))
 
             # scope and collections limits according to max_limits
             new_collection_per_scope_number = get_divisor(max_limits)
