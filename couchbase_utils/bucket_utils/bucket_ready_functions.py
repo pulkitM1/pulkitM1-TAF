@@ -2006,6 +2006,7 @@ class BucketUtils(ScopeUtils):
                 bucket_spec[spec_name] = default_scope[spec_name]
 
         if default_scope:
+            print("ttrue")
             bucket_spec_check(MetaConstants.NUM_SCOPES_PER_BUCKET)
             bucket_spec_check(MetaConstants.NUM_ITEMS_PER_COLLECTION)
             bucket_spec_check(MetaConstants.NUM_COLLECTIONS_PER_SCOPE)
