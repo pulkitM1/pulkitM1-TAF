@@ -1983,9 +1983,9 @@ class BucketUtils(ScopeUtils):
         return task
 
     def specs_for_serverless(self, bucket_spec):
-        for bucket in bucket_spec["buckets"]:
+        for bucket in bucket_spec:
             self.balance_scopes_collections_items(
-                    bucket_spec["buckets"][bucket])
+                    bucket_spec[bucket])
 
     def balance_scopes_collections_items(self, bucket_spec):
         def get_divisor(max_limits_variable):
