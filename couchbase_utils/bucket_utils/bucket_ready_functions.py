@@ -2039,7 +2039,7 @@ class BucketUtils(ScopeUtils):
         print("expanded bucket set!!!")
         print(buckets_spec)
         if CbServer.cluster_profile == "serverless":
-            self.bucket_util.specs_for_serverless(buckets_spec)
+            self.specs_for_serverless(buckets_spec)
         bucket_creation_tasks = list()
         for bucket_name, bucket_spec in buckets_spec.items():
             print(":buckert namwe!")
