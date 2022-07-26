@@ -551,8 +551,6 @@ class CBASBaseTest(BaseTestCase):
 
         # Process params to over_ride values if required
         self.over_ride_bucket_template_params(cluster, buckets_spec)
-        if CbServer.cluster_profile == "serverless":
-            self.bucket_util.specs_for_serverless(buckets_spec)
         self.bucket_util.create_buckets_using_json_data(cluster, buckets_spec)
         self.bucket_util.wait_for_collection_creation_to_complete(cluster)
 

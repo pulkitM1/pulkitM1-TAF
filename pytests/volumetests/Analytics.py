@@ -306,8 +306,6 @@ class volume(BaseTestCase):
         # Process params to over_ride values if required
         self.over_ride_bucket_template_params(buckets_spec,cluster)
         self.over_ride_doc_loading_template_params(doc_loading_spec)
-        if CbServer.cluster_profile == "serverless":
-            self.bucket_util.specs_for_serverless(buckets_spec)
 
         num_of_buckets = buckets_spec[MetaConstants.NUM_BUCKETS]
         buckets_spec["buckets"] = {}

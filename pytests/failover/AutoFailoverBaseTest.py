@@ -142,8 +142,6 @@ class AutoFailoverBaseTest(ClusterSetup):
         # Process params to over_ride values if required
         self.over_ride_bucket_template_params(buckets_spec)
         self.over_ride_doc_loading_template_params(doc_loading_spec)
-        if CbServer.cluster_profile == "serverless":
-            self.bucket_util.specs_for_serverless(buckets_spec)
         self.set_retry_exceptions_for_initial_data_load(doc_loading_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
                                                         buckets_spec)
@@ -1042,8 +1040,6 @@ class DiskAutoFailoverBasetest(AutoFailoverBaseTest):
         buckets_spec[MetaConstants.USE_SIMPLE_NAMES] = self.use_simple_names
         doc_loading_spec = \
             self.bucket_util.get_crud_template_from_package("initial_load")
-        if CbServer.cluster_profile == "serverless":
-            self.bucket_util.specs_for_serverless(buckets_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
                                                         buckets_spec)
         self.bucket_util.wait_for_collection_creation_to_complete(self.cluster)

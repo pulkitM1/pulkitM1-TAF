@@ -1983,14 +1983,11 @@ class BucketUtils(ScopeUtils):
         return task
 
     def specs_for_serverless(self, bucket_spec):
-        self.balance_scopes_collections_items(bucket_spec)
-        if "buckets" in bucket_spec:
-            for bucket in bucket_spec["buckets"]:
-                self.balance_scopes_collections_items(
-                    bucket_spec["buckets"][bucket], bucket_spec)
+        for bucket in bucket_spec["buckets"]:
+            self.balance_scopes_collections_items(
+                    bucket_spec["buckets"][bucket])
 
-    def balance_scopes_collections_items(self, bucket_spec,
-                                         default_scope=None):
+    def balance_scopes_collections_items(self, bucket_spec):
         def get_divisor(max_limits_variable):
             factor_list = []
             i = 1
@@ -2000,16 +1997,6 @@ class BucketUtils(ScopeUtils):
                 i = i + 1
             return_index = (len(factor_list) // 2)
             return factor_list[return_index]
-
-        def bucket_spec_check(spec_name):
-            if spec_name not in bucket_spec:
-                bucket_spec[spec_name] = default_scope[spec_name]
-
-        if default_scope:
-            print("ttrue")
-            bucket_spec_check(MetaConstants.NUM_SCOPES_PER_BUCKET)
-            bucket_spec_check(MetaConstants.NUM_ITEMS_PER_COLLECTION)
-            bucket_spec_check(MetaConstants.NUM_COLLECTIONS_PER_SCOPE)
 
         print("speccc")
         print(bucket_spec)
@@ -2051,6 +2038,8 @@ class BucketUtils(ScopeUtils):
                                                        buckets_spec)
         print("expanded bucket set!!!")
         print(buckets_spec)
+        if CbServer.cluster_profile == "serverless":
+            self.bucket_util.specs_for_serverless(buckets_spec)
         bucket_creation_tasks = list()
         for bucket_name, bucket_spec in buckets_spec.items():
             print(":buckert namwe!")
