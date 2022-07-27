@@ -145,7 +145,9 @@ class AutoFailoverBaseTest(ClusterSetup):
         self.set_retry_exceptions_for_initial_data_load(doc_loading_spec)
         self.bucket_util.create_buckets_using_json_data(self.cluster,
                                                         buckets_spec)
+        print("outside!!")
         self.bucket_util.wait_for_collection_creation_to_complete(self.cluster)
+        print("next!!!")
         # Prints bucket stats before doc_ops
         self.bucket_util.print_bucket_stats(self.cluster)
         # Init sdk_client_pool if not initialized before

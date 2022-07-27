@@ -2045,12 +2045,13 @@ class BucketUtils(ScopeUtils):
         print(buckets_spec)
         load_data_from_existing_tar = False
         rest_conn = RestConnection(cluster.master)
+        if CbServer.cluster_profile == "serverless":
+            self.specs_for_serverless(buckets_spec)
+        print(buckets_spec)
         buckets_spec = BucketUtils.expand_buckets_spec(rest_conn,
                                                        buckets_spec)
         print("expanded bucket set!!!")
         print(buckets_spec)
-        if CbServer.cluster_profile == "serverless":
-            self.specs_for_serverless(buckets_spec)
         bucket_creation_tasks = list()
         for bucket_name, bucket_spec in buckets_spec.items():
             print(":buckert namwe!")
